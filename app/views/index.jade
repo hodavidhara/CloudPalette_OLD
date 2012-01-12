@@ -1,2 +1,17 @@
-h1= title
-p Welcome to #{title}
+!!! 5
+html(lang="en")
+  head
+    title
+      CloudPalette
+    link(rel='stylesheet', type='text/css', href='/stylesheets/style.css')
+    script(type='text/javascript', src='http://code.jquery.com/jquery-1.6.2.min.js')
+    script(type='text/javascript', src='../javascripts/canvasUtil.js')
+    script(type='text/javascript', src='../javascripts/canvasDemo.js')    
+  body
+    #main
+      #toolbar
+        button#paintbrush(name='paintbrush')
+          p PaintBrush!
+      canvas#demo(width='600px', height='400px')
+        p Get a real browser!
+      .clear

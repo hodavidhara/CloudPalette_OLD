@@ -1,8 +1,21 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+#main {
+    margin: 100px auto;
+    border: 1px solid black;
+    width: 701px;
 }
 
-a {
-  color: #00B7FF;
+#demo {
+    display: block;
+    float: left;
+}
+
+#toolbar {
+    border-right: 1px solid black;
+    height: 400px;
+    width: 100px;
+    float: left;
+}
+
+.clear {
+    clear: both;
 }
