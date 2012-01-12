@@ -1,0 +1,9 @@
+﻿What I'd like to do is create an image editing web application similar to photoshop using canvas and JavaScript. I say photoshop because even though I know I could not pull off that many features, I'd like it to be a step up from something like Microsoft paint. The really big feature I would like to center my efforts around are image layers, as I think that is what separates high end from low end image editing software.
+
+for my stack I plan on using Node.js on the backend with Express.js as the web framework. I will probably use the jade template engine to render my views. As previously stated, for the front end of the application I'll be using the canvas element to do the drawing with pure JavaScript.
+
+Another thing, is I'd like to tie my database project in with the image editor, so users would have accounts, and would be capable of saving their images to their account, giving them the ability to work on their art from anywhere. To make my database project large enough I plan to move it in the social directions where users can 'publish' their work, and other users can vote and comment on pictures, and anyone can just look around at the top 'published' works and such. I realize the second half is a lot of work to fully implement, so I might leave that part to the database project, and leave it for future implementation.
+
+The project is one that fits well with the agile development methodology. I can very quickly get a simple canvas up and running with a paintbrush tool, and from there add on more and more tools and functionality as time allows.
+
+*Note to Professor Magally - if some of this looks familiar, I copied a bunch from the email you saw.
