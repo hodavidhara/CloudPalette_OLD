@@ -1,7 +1,7 @@
 /**
  * image.js
  * 
- * The image class representing the data for each image
+ * The image constructor function representing the data for each image
  */
 
 var Image = function (ctx, width, height) {
