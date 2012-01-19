@@ -5,7 +5,7 @@
  */
 
 var CloudPalette = {
-  image: {}
+  images: {},
 };
 
 include.includeInit([
@@ -18,3 +18,13 @@ include.includeInit([
   '/js/prototype/image.js'
   
 ]);
+
+$(function () {
+  var canvasJQ = $('#demo'),
+      canvas = $('#demo').get(0),
+      ctx = canvas.getContext('2d'),
+      offsetLeft = $('#demo').offset().left;
+      offsetTop = $('#demo').offset().top;
+  
+  CloudPalette.images.push(new CloudPalette.Image(ctx, canvas.width, canvas.height));
+});

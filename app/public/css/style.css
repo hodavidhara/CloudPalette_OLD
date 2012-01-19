@@ -1,21 +1,28 @@
 #main {
-    margin: 100px auto;
-    border: 1px solid black;
-    width: 701px;
+  border: 1px solid black;
 }
 
 #demo {
-    display: block;
-    float: left;
+  display: block;
+  float: left;
 }
 
-#toolbar {
-    border-right: 1px solid black;
-    height: 400px;
-    width: 100px;
-    float: left;
+#left-toolbar {
+  border-right: 1px solid black;
+  width: 150px;
+  float: left;
+}
+
+#right-toolbar {
+  border-left: 1px solid black;
+  float: right;
+  width: 200px;
+}
+
+#layers {
+  border-top: 1px solid black;
 }
 
 .clear {
-    clear: both;
+  clear: both;
 }

@@ -8,3 +8,11 @@ html(lang="en")
     script(type='text/javascript', src='/js/cloudpalette.js')    
   body
     h1.banner CloudPalette
+    #main
+      #left-toolbar
+        button#paintbrush(name='paintbrush') PaintBrush!
+      canvas#demo(width='600px', height='400px') Get a real browser!
+      #right-toolbar
+        button#newlayer(name='newlayer') New Layer!
+        #layers
+      .clear

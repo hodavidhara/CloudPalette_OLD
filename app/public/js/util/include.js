@@ -3,6 +3,8 @@
  *
  * Utility script to include js files within other js files,
  * so you can js file while you js file.
+ * 
+ * Authored by David Hara and Andrew Forney.
  */
 
 var include = {
