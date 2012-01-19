@@ -5,6 +5,6 @@
  * layer in an image
  */
 
-var Layer = function (data, height, width) {
+CloudPalette.Layer = function (data, height, width) {
   var name;
 };

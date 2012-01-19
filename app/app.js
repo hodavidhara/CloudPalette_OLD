@@ -33,5 +33,9 @@ app.get('/', function(req, res){
   res.render('index', {});
 });
 
+app.get('/editor', function(req, res){
+  res.render('editor', {});
+});
+
 app.listen(3030);
 console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);

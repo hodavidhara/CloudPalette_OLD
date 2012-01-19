@@ -4,7 +4,7 @@
  * The image constructor function representing the data for each image
  */
 
-var Image = function (ctx, width, height) {
+CloudPalette.Image = function (ctx, width, height) {
   var layers = [],
       history = [];
       

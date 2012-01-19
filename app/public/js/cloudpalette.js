@@ -4,6 +4,17 @@
  * The file where the magic happens.
  */
 
-var cloudpalette = {
+var CloudPalette = {
   image: {}
 };
+
+include.includeInit([
+  
+  /****** Utils ******/
+  '/js/util/canvasUtil.js',
+  
+  /****** Prototypes ******/
+  '/js/prototype/layer.js',
+  '/js/prototype/image.js'
+  
+]);
