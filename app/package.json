@@ -1,9 +1,15 @@
 {
-    "name": "application-name"
-  , "version": "0.0.1"
-  , "private": true
-  , "dependencies": {
-      "express": "2.4.7"
-    , "jade": ">= 0.0.1"
-  }
+  "name": "CloudPalette",
+  "version": "0.0.1",
+  "description": "An image editing webapp",
+  "author": "David Hara <hakuhen@gmail.com>",
+  "dependencies": {
+    "express": "2.4.7",
+    "jade": ">= 0.0.1"
+  },
+  "devDependencies": {
+    "express": "2.4.7",
+    "jade": ">= 0.0.1"
+  },
+  "engine": "node >= 0.4.1"
 }
