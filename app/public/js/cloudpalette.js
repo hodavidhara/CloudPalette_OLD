@@ -12,7 +12,8 @@ var CloudPalette = (function () {
             history = [],
             placeInHistory = 0,
             width = w,
-            height = h;
+            height = h,
+            activeLayer = 0;
 
         // Create the initial layer
         // TODO: will eventually have to change this to pass in actually data for the second argument.
@@ -25,11 +26,12 @@ var CloudPalette = (function () {
           return layers;
         };
         
+        // TODO: rewrite so that users can lookup by layer name OR index.
         this.getLayer = function (i) {
           if (layers[i]) {
             return layers[i];
           } else {
-            console.error ("No layer with index " + index + " exists.");
+            console.error ("No layer with index " + i + " exists.");
           }
         };
         
@@ -78,11 +80,12 @@ var CloudPalette = (function () {
         this.setName = function (n) {
           name = n;
         }
-      },
-      images = {};
+      };
+  var images = {};
       
   CP.newImage = function (name, width, height) {
     images[name] = new Image(width, height);
+    return images[name];
   };
       
   CP.getImages = function () {
@@ -97,7 +100,10 @@ var CloudPalette = (function () {
     }
   };
   
+  // export as a node-module for unit testing.
+  module.exports = CP;
   
+  // return as a normal JS module for front-end use.
   return CP
   
 }());

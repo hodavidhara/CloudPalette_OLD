@@ -9,7 +9,8 @@
   },
   "devDependencies": {
     "express": "2.4.7",
-    "jade": ">= 0.0.1"
+    "jade": ">= 0.0.1",
+    "vows": "0.6.x"
   },
   "engine": "node >= 0.4.1"
 }
