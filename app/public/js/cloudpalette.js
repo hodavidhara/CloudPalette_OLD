@@ -6,6 +6,7 @@
 
 var CloudPalette = (function () {
   var CP = {},
+  
       // Image prototype.
       Image = function (w, h) {
         var layers = [],
@@ -27,11 +28,21 @@ var CloudPalette = (function () {
         };
         
         // TODO: rewrite so that users can lookup by layer name OR index.
-        this.getLayer = function (i) {
-          if (layers[i]) {
-            return layers[i];
-          } else {
-            console.error ("No layer with index " + i + " exists.");
+        this.getLayer = function (lookup) {
+          if (typeof lookup === "string") {
+            for (var i = 0; i < layers.length; i ++) {
+              if (layers[i].getName() === lookup) {
+                console.log(layers[i].getName());
+                return layers[i];
+              }
+            }
+            console.error('No layer named "' + lookup + '" exists.');
+          } else if (typeof lookup === "number") {
+            if (layers[lookup]) {
+              return layers[lookup];
+            } else {
+              console.error("No layer with index " + lookup + " exists.");
+            }
           }
         };
         
