@@ -2,17 +2,29 @@
 html(lang="en")
   head
     title CloudPalette
+    link(rel='stylesheet', type='text/css', href='/css/reset.css')
     link(rel='stylesheet', type='text/css', href='/css/style.css')
     script(type='text/javascript', src='http://code.jquery.com/jquery-1.6.2.min.js')
-    script(type='text/javascript', src='/js/util/include.js')
-    script(type='text/javascript', src='/js/cloudpalette.js')    
+    script(type='text/javascript', src='/js/cloudpalette.js')
+    script(type='text/javascript', src='/js/editor.js')
   body
-    h1.banner CloudPalette
-    #main
-      #left-toolbar
-        button#paintbrush(name='paintbrush') PaintBrush!
-      canvas#demo(width='600px', height='400px') Get a real browser!
-      #right-toolbar
-        button#newlayer(name='newlayer') New Layer!
-        #layers
-      .clear
+    #menu-bar
+      ul.horizontal-menu.bottom-right-radius
+        li.horizontal-menu-item
+          p.bottom-left-radius File
+          ul.horizontal-submenu
+            li.horizontal-submenu-item
+              p New Image
+            li.horizontal-submenu-item
+              p Save Image
+            li.horizontal-submenu-item
+              p Load Image
+        li.horizontal-menu-item
+          p Edit
+        li.horizontal-menu-item
+          p Layers
+        li.horizontal-menu-item
+          p.bottom-right-radius Help
+        .clear
+    #toolbar
+      button#paintbrush(name='paintbrush') PaintBrush!

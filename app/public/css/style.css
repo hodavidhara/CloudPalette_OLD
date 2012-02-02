@@ -26,3 +26,77 @@
 .clear {
   clear: both;
 }
+
+/* EDITOR */
+
+#menu-bar {
+  position: fixed;
+  left: 200px;
+  z-index: 4;
+}
+
+.horizontal-menu {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: block;
+  border-right: 1px solid black;
+}
+
+.horizontal-menu-item {
+  float: left;
+  position: relative;
+}
+
+.horizontal-menu-item p {
+  padding: 10px 10px 10px 10px;
+  border: 1px solid black;
+  border-right: 0;
+}
+
+.horizontal-submenu {
+  display: none;
+  position: absolute;
+  border-bottom: 1px solid black;
+  white-space: nowrap;
+}
+
+.horizontal-submenu-item p {
+  display: block;
+  padding: 10px 10px 10px 10px;
+  border: 1px solid black;
+  border-bottom: 0;
+}
+
+#toolbar {
+  position: fixed;
+  left: 100px;
+  top: 100px;
+  z-index: 4;
+}
+
+/* Misc */
+
+.bottom-right-radius {
+  -webkit-border-bottom-right-radius: 5px;
+  -moz-border-radius-bottomright: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.bottom-left-radius {
+  -webkit-border-bottom-left-radius: 5px;
+  -moz-border-radius-bottomleft: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+.top-left-radius {
+  -webkit-border-top-left-radius: 5px;
+  -moz-border-radius-topleft: 5px;
+  border-top-left-radius: 5px;
+}
+
+.top-right-radius {
+  -webkit-border-top-right-radius: 5px;
+  -moz-border-radius-topright: 5px;
+  border-top-right-radius: 5px;
+}
