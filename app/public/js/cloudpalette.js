@@ -29,20 +29,21 @@ var CloudPalette = (function () {
         
         // TODO: rewrite so that users can lookup by layer name OR index.
         this.getLayer = function (lookup) {
-          if (typeof lookup === "string") {
+          if (typeof lookup === 'string') {
             for (var i = 0; i < layers.length; i ++) {
               if (layers[i].getName() === lookup) {
-                console.log(layers[i].getName());
                 return layers[i];
               }
             }
-            console.error('No layer named "' + lookup + '" exists.');
-          } else if (typeof lookup === "number") {
+            throw new Error('No layer named "' + lookup + '" exists.')
+          } else if (typeof lookup === 'number') {
             if (layers[lookup]) {
               return layers[lookup];
             } else {
-              console.error("No layer with index " + lookup + " exists.");
+              throw new Error('No layer with index ' + lookup + ' exists.')
             }
+          } else {
+            throw new Error('Invalid argument')
           }
         };
         
