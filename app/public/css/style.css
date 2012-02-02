@@ -70,9 +70,24 @@
 
 #toolbar {
   position: fixed;
-  left: 100px;
+  left: 50px;
   top: 100px;
   z-index: 4;
+}
+
+.canvas-window {
+  position: fixed;
+  left: 200px;
+  top: 150px;
+  border: 1px solid black;
+}
+
+.inactive-canvas {
+  z-index: 2;
+}
+
+.active-canvas {
+  z-index: 3;
 }
 
 /* Misc */
