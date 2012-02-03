@@ -2,18 +2,6 @@
 // front-end scripts for the CloudPalette editor;
 
 $(function () {
-  // Binding for the menu
-  // hover bind to show submenu dropdowns.
-  $(".horizontal-menu-item").hover(
-    function () {
-      $(this).children(".horizontal-submenu").css('display', 'block');
-    },
-    function () {
-      $(this).children(".horizontal-submenu").css('display', 'none');
-    }
-  );
-  // click binding for all the submenu items.
-  $('#new-image').click(createNewImage);
   
   var createNewImage = function () {
     var canvasName = prompt('What would you like to name your Image?', 'Untitled');
@@ -27,7 +15,7 @@ $(function () {
     '</div>'
     )
     makeDraggable(canvasName);
-  }
+  };
   
   var makeDraggable = function (canvasName) {
     $(".canvas-window#canvas-" + canvasName).draggable({ disabled: true });
@@ -44,5 +32,19 @@ $(function () {
       }
     );
   };
+  
+  // Binding for the menu
+  // hover bind to show submenu dropdowns.
+  $(".horizontal-menu-item").hover(
+    function () {
+      $(this).children(".horizontal-submenu").css('display', 'block');
+    },
+    function () {
+      $(this).children(".horizontal-submenu").css('display', 'none');
+    }
+  );
+  
+  // click binding for all the submenu items.
+  $('#new-image').click(createNewImage);
   
 });
