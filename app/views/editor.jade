@@ -4,7 +4,8 @@ html(lang="en")
     title CloudPalette
     link(rel='stylesheet', type='text/css', href='/css/reset.css')
     link(rel='stylesheet', type='text/css', href='/css/style.css')
-    script(type='text/javascript', src='http://code.jquery.com/jquery-1.6.2.min.js')
+    script(type='text/javascript', src='/js/lib/jquery-1.7.1.min.js')
+    script(type='text/javascript', src='/js/lib/jquery-ui-1.8.17.custom.min.js')
     script(type='text/javascript', src='/js/cloudpalette.js')
     script(type='text/javascript', src='/js/editor.js')
   body
@@ -13,11 +14,11 @@ html(lang="en")
         li.horizontal-menu-item
           p.bottom-left-radius File
           ul.horizontal-submenu
-            li.horizontal-submenu-item
+            li.horizontal-submenu-item#new-image
               p New Image
-            li.horizontal-submenu-item
+            li.horizontal-submenu-item#save-image
               p Save Image
-            li.horizontal-submenu-item
+            li.horizontal-submenu-item#load-image
               p Load Image
         li.horizontal-menu-item
           p Edit
@@ -28,6 +29,3 @@ html(lang="en")
         .clear
     #toolbar
       button#paintbrush(name='paintbrush') PaintBrush!
-    .canvas-window
-      .window-menu
-      canvas(width=400, height=400);
