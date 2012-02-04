@@ -3,19 +3,28 @@
 
 $(function () {
   
-  var createNewImage = function () {
+  var createImage = function () {
     var canvasName = prompt('What would you like to name your Image?', 'Untitled');
     $('body').append(
-    '<div id="canvas-' + canvasName + '" class="canvas-window">' +
-      '<div class="window-menu">' +
-        '<button name="close" class="close">Close!</button>' +
-        '<p>'+canvasName+'</p>' +
-      '</div>' +
-      '<canvas width="400" height="400">Get a real browser!</canvas>' +
-    '</div>'
-    )
+      '<div id="canvas-' + canvasName + '" class="canvas-window">' +
+        '<div class="window-menu">' +
+          '<button name="close" class="close">Close!</button>' +
+          '<p>'+canvasName+'</p>' +
+        '</div>' +
+        '<canvas width="400" height="400">Get a real browser!</canvas>' +
+      '</div>'
+    );
     makeDraggable(canvasName);
+    makeRemovable(canvasName);
   };
+  
+  var makeRemovable = function (canvasName) {
+    $(".canvas-window#canvas-" + canvasName).find('.close').click(
+    function () {
+      $(".canvas-window#canvas-" + canvasName).remove();
+    }
+  );
+  }
   
   var makeDraggable = function (canvasName) {
     $(".canvas-window#canvas-" + canvasName).draggable({ disabled: true });
@@ -45,6 +54,6 @@ $(function () {
   );
   
   // click binding for all the submenu items.
-  $('#new-image').click(createNewImage);
+  $('#new-image').click(createImage);
   
 });
