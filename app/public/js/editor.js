@@ -16,27 +16,36 @@ $(function () {
     );
     makeDraggable(canvasName);
     makeRemovable(canvasName);
+    makeActivatable(canvasName);
   };
   
+  var makeActivatable = function (canvasName) {
+    $('.active-canvas').removeClass('active-canvas').addClass('inactive-canvas');
+    $('.canvas-window#canvas-' + canvasName).addClass('active-canvas').find('*').mousedown(function () {
+      $('.active-canvas').removeClass('active-canvas').addClass('inactive-canvas');
+      $('.canvas-window#canvas-' + canvasName).removeClass('active-canvas').addClass('active-canvas');
+    });
+  }
+  
   var makeRemovable = function (canvasName) {
-    $(".canvas-window#canvas-" + canvasName).find('.close').click(
+    $('.canvas-window#canvas-' + canvasName).find('.close').click(
     function () {
-      $(".canvas-window#canvas-" + canvasName).remove();
+      $('.canvas-window#canvas-' + canvasName).remove();
     }
   );
   }
   
   var makeDraggable = function (canvasName) {
-    $(".canvas-window#canvas-" + canvasName).draggable({ disabled: true });
-    $(".canvas-window#canvas-" + canvasName).children(".window-menu").mousedown(
+    $('.canvas-window#canvas-' + canvasName).draggable({ disabled: true });
+    $('.canvas-window#canvas-' + canvasName).children('.window-menu').mousedown(
       function () {
-        $(".canvas-window#canvas-" + canvasName).draggable("option", "disabled", false)
+        $('.canvas-window#canvas-' + canvasName).draggable('option', 'disabled', false)
         .trigger('mousedown')
         .css('cursor', 'move');
       }
     ).mouseup(
       function () {
-        $(".canvas-window#canvas-" + canvasName).draggable( "option", "disabled", true )
+        $('.canvas-window#canvas-' + canvasName).draggable( 'option', 'disabled', true )
         .css('cursor', 'auto');
       }
     );
@@ -44,12 +53,12 @@ $(function () {
   
   // Binding for the menu
   // hover bind to show submenu dropdowns.
-  $(".horizontal-menu-item").hover(
+  $('.horizontal-menu-item').hover(
     function () {
-      $(this).children(".horizontal-submenu").css('display', 'block');
+      $(this).children('.horizontal-submenu').css('display', 'block');
     },
     function () {
-      $(this).children(".horizontal-submenu").css('display', 'none');
+      $(this).children('.horizontal-submenu').css('display', 'none');
     }
   );
   
