@@ -99,11 +99,11 @@
   float: right;
 }
 
-.inactive-canvas {
+.inactive-window {
   z-index: 2;
 }
 
-.active-canvas {
+.active-window {
   z-index: 3;
 }
 

@@ -4,52 +4,59 @@
 $(function () {
   
   var createImage = function () {
-    var canvasName = prompt('What would you like to name your Image?', 'Untitled');
+    var canvasName = prompt('What would you like to name your Image?', 'Untitled-' + (CloudPalette.getImageCount()+1));
     $('body').append(
-      '<div id="canvas-' + canvasName + '" class="canvas-window">' +
+      '<div id="window-' + canvasName + '" class="canvas-window">' +
         '<div class="window-menu">' +
           '<button name="close" class="close">Close!</button>' +
           '<p>'+canvasName+'</p>' +
         '</div>' +
-        '<canvas width="400" height="400">Get a real browser!</canvas>' +
+        '<canvas id="canvas-' + canvasName + '" width="400" height="400">Get a real browser!</canvas>' +
       '</div>'
     );
     makeDraggable(canvasName);
     makeRemovable(canvasName);
     makeActivatable(canvasName);
+    CloudPalette.newImage(canvasName, getContext(canvasName), 400, 400);
   };
   
   var makeActivatable = function (canvasName) {
-    $('.active-canvas').removeClass('active-canvas').addClass('inactive-canvas');
-    $('.canvas-window#canvas-' + canvasName).addClass('active-canvas').find('*').mousedown(function () {
-      $('.active-canvas').removeClass('active-canvas').addClass('inactive-canvas');
-      $('.canvas-window#canvas-' + canvasName).removeClass('active-canvas').addClass('active-canvas');
+    CloudPalette.setActiveImage(canvasName);
+    $('.active-window').removeClass('active-window').addClass('inactive-window');
+    $('.canvas-window#window-' + canvasName).addClass('active-window').find('*').mousedown(function () {
+      $('.active-window').removeClass('active-window').addClass('inactive-window');
+      $('.canvas-window#window-' + canvasName).removeClass('inactive-window').addClass('active-window');
+      CloudPalette.setActiveImage(canvasName);
     });
   }
   
   var makeRemovable = function (canvasName) {
-    $('.canvas-window#canvas-' + canvasName).find('.close').click(
+    $('.canvas-window#window-' + canvasName).find('.close').click(
     function () {
-      $('.canvas-window#canvas-' + canvasName).remove();
+      $('.canvas-window#window-' + canvasName).remove();
     }
   );
   }
   
   var makeDraggable = function (canvasName) {
-    $('.canvas-window#canvas-' + canvasName).draggable({ disabled: true });
-    $('.canvas-window#canvas-' + canvasName).children('.window-menu').mousedown(
+    $('.canvas-window#window-' + canvasName).draggable({ disabled: true });
+    $('.canvas-window#window-' + canvasName).children('.window-menu').mousedown(
       function () {
-        $('.canvas-window#canvas-' + canvasName).draggable('option', 'disabled', false)
+        $('.canvas-window#window-' + canvasName).draggable('option', 'disabled', false)
         .trigger('mousedown')
         .css('cursor', 'move');
       }
     ).mouseup(
       function () {
-        $('.canvas-window#canvas-' + canvasName).draggable( 'option', 'disabled', true )
+        $('.canvas-window#window-' + canvasName).draggable( 'option', 'disabled', true )
         .css('cursor', 'auto');
       }
     );
   };
+  
+  var getContext = function (canvasName) {
+    return $('.canvas-window#window-' + canvasName).find('#canvas-' + canvasName).get(0).getContext('2d');
+  }
   
   // Binding for the menu
   // hover bind to show submenu dropdowns.

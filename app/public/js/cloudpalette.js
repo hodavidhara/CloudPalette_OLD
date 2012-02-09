@@ -8,10 +8,11 @@ var CloudPalette = (function () {
   var CP = {},
   
       // Image prototype.
-      Image = function (w, h) {
+      Image = function (c, w, h) {
         var layers = [],
             history = [],
             placeInHistory = 0,
+            ctx = c,
             width = w,
             height = h,
             activeLayer = 0;
@@ -93,10 +94,11 @@ var CloudPalette = (function () {
           name = n;
         }
       };
-  var images = {};
+  var images = {},
+      activeImage = undefined;
       
-  CP.newImage = function (name, width, height) {
-    images[name] = new Image(width, height);
+  CP.newImage = function (name, ctx, width, height) {
+    images[name] = new Image(ctx, width, height);
     return images[name];
   };
       
@@ -112,10 +114,22 @@ var CloudPalette = (function () {
     }
   };
   
-  // export as a node-module for unit testing.
-  module.exports = CP;
+  CP.getImageCount = function () {
+    return Object.keys(images).length
+  };
+  
+  CP.getActiveImage = function () {
+    return active;
+  };
+  
+  CP.setActiveImage = function (newActive) {
+    active = newActive;
+  };
   
   // return as a normal JS module for front-end use.
   return CP
   
 }());
+
+  // export as a node-module for unit testing.
+  module.exports = CloudPalette;
