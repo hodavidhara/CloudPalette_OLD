@@ -52,6 +52,9 @@ var CloudPalette = (function () {
           layers.push(new Layer(name, data));
         };
         
+        this.getContext = function () {
+          return ctx;
+        }
         
         //TODO: Might need to do object/array cloning in the following three functions
         // because the history array is an array of layer objects. Look up the best way
@@ -119,11 +122,15 @@ var CloudPalette = (function () {
   };
   
   CP.getActiveImage = function () {
-    return active;
+    return activeImage;
   };
   
   CP.setActiveImage = function (newActive) {
-    active = newActive;
+    if (images[newActive]) {
+      activeImage = images[newActive];
+    } else {
+      console.error("No image with the name " + newActive + " exists.");
+    }
   };
   
   // return as a normal JS module for front-end use.
