@@ -2,7 +2,7 @@
 // front-end scripts for the CloudPalette editor;
 
 $(function () {
-  
+  var currentTool = null;
   // Function that adds in the new window that contains the canvas, and creates the image object
   // Also calls all of the functions that does most a lot of the bindings.
   var createImage = function () {
@@ -30,6 +30,8 @@ $(function () {
       $('.active-window').removeClass('active-window').addClass('inactive-window');
       $('.canvas-window#window-' + canvasName).removeClass('inactive-window').addClass('active-window');
       CloudPalette.setActiveImage(canvasName);
+      unbindCanvas($('.inactive-window').find('canvas'));
+      bindTool($('.active-window').find('canvas'), currentTool);
     });
   };
   
@@ -78,16 +80,18 @@ $(function () {
   );
   
   var bindTool = function (canvas, toolFunction) {
-    toolFunction(canvas);
+    if(toolFunction){
+     toolFunction(canvas); 
+    }
   };
   
   var unbindCanvas = function (canvas) {
-    canvas.unbind();
+    canvas.unbind('.tool');
   };
   
   var pencilTool = function (canvas) {
     var ctx = CloudPalette.getActiveImage().getContext();
-    $(window).mousedown(function (event) {
+    canvas.bind('mousedown.tool', function (event) {
       var oldX = event.offsetX,
           oldY = event.offsetY;
       canvas.mousemove(function (event) {
@@ -104,15 +108,16 @@ $(function () {
       .mouseleave(function (event) {
         oldX = oldY = null;
       });
-    })
-    .mouseup(function (event) {
-        canvas.unbind('mousemove');
+    });
+    $(window).mouseup(function (event) {
+      canvas.unbind('mousemove');
     });
       
   };
   
   $('#paintbrush').click(function () {
     bindTool($('.active-window').find('canvas'), pencilTool)
+    currentTool = pencilTool;
   });
   
   // click binding for all the submenu items.
