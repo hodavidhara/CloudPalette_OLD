@@ -4,6 +4,8 @@ CloudPalette is an online image editor.
 
 This project was developed as part of the LMU course CMSI 402.
 
+check out the most recent working build at [www.cloudpalette.net](www.cloudpalette.net)
+
 ## Setting up CloudPalette on a Linux box
 
 _(...with only slight modifications to get it working on other *nixes like OS/X)_
