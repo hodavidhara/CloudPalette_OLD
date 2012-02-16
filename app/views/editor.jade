@@ -24,8 +24,19 @@ html(lang="en")
           p Edit
         li.horizontal-menu-item
           p Layers
+          ul.horizontal-submenu
+            li.horizontal-submenu-item#new-layer
+              p New Layer
+            li.horizontal-submenu-item#delete-layer
+              p Delete Layer
+            li.horizontal-submenu-item#load-image
         li.horizontal-menu-item
           p.bottom-right-radius Help
         .clear
-    #toolbar
+    #toolbar-container
+      .header
+        p tools
       button#paintbrush(name='paintbrush') PaintBrush!
+    #layer-container
+      .header
+        p layers

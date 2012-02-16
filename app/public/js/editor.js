@@ -2,7 +2,8 @@
 // front-end scripts for the CloudPalette editor;
 
 $(function () {
-  var currentTool = null;
+  var currentTool = null,
+      activeImage = null;
   // Function that adds in the new window that contains the canvas, and creates the image object
   // Also calls all of the functions that does most a lot of the bindings.
   var createImage = function () {
@@ -16,11 +17,20 @@ $(function () {
         '<canvas id="canvas-' + canvasName + '" width="400" height="400">Get a real browser!</canvas>' +
       '</div>'
     );
+    var top = 150 + (40 * (CloudPalette.getImageCount() % 10)),
+        left = 400 + (40 * (CloudPalette.getImageCount() % 10));
+    $('.canvas-window#window-' + canvasName).css({top: (top.toString() + 'px'), left: (left.toString() + 'px')});
     CloudPalette.newImage(canvasName, getContext(canvasName), 400, 400);
     makeDraggable(canvasName);
     makeRemovable(canvasName);
-    makeActivatable(canvasName);    
+    makeActivatable(canvasName);
+    activeImage = CloudPalette.getImage(canvasName);
   };
+  
+  var newLayer = function () {
+    var layerName = prompt('What would you like to name your new layer?', 'Untitled-' + (activeImage.getLayers().length));
+    activeImage.newLayer(layerName, {});
+  }
   
   // function to make a new window "activatable." Basically makes it pop to the front when clicked on
   var makeActivatable = function (canvasName) {
@@ -32,6 +42,8 @@ $(function () {
       CloudPalette.setActiveImage(canvasName);
       unbindCanvas($('.inactive-window').find('canvas'));
       bindTool($('.active-window').find('canvas'), currentTool);
+      activeImage = CloudPalette.getImage(canvasName);
+      loadLayers();
     });
   };
   
@@ -61,6 +73,22 @@ $(function () {
     );
   };
   
+  var loadLayers = function () {
+    $('.layer').remove();
+    var layers = activeImage.getLayers();
+    for (var i = layers.length - 1; i >= 0; i--) {
+      $('#layer-container').append(
+        '<div class="layer">' +
+          '<div class="layer-picture"></div>' +
+          '<div class="layer-name">' +
+            '<p>' + layers[i].getName() + '</p>' +
+          '</div>' +
+        '<div class="clear"></div>'  
+      )
+      
+    }
+  }
+  
   // gets the context from the canvas element, given the name of the image.
   // This should only be used once to get the context from the canvas, then stored in the
   // Image object. From then on we should be using the Images getContext function.
@@ -79,6 +107,10 @@ $(function () {
     }
   );
   
+  
+  /*********** Tool related functions *************/
+  
+  
   var bindTool = function (canvas, toolFunction) {
     if(toolFunction){
      toolFunction(canvas); 
@@ -89,6 +121,7 @@ $(function () {
     canvas.unbind('.tool');
   };
   
+  // This is the pencil tool
   var pencilTool = function (canvas) {
     var ctx = CloudPalette.getActiveImage().getContext();
     canvas.bind('mousedown.tool', function (event) {
@@ -115,6 +148,8 @@ $(function () {
       
   };
   
+  /***************** Simple Bindings **********/
+  
   $('#paintbrush').click(function () {
     bindTool($('.active-window').find('canvas'), pencilTool)
     currentTool = pencilTool;
@@ -122,5 +157,7 @@ $(function () {
   
   // click binding for all the submenu items.
   $('#new-image').click(createImage);
+  
+  $('#new-layer').click(newLayer);
   
 });
