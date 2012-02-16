@@ -25,22 +25,25 @@ $(function () {
     makeRemovable(canvasName);
     makeActivatable(canvasName);
     activeImage = CloudPalette.getImage(canvasName);
+    loadLayers();
   };
   
   var newLayer = function () {
     var layerName = prompt('What would you like to name your new layer?', 'Untitled-' + (activeImage.getLayers().length));
     activeImage.newLayer(layerName, {});
+    loadLayers();
   }
   
   // function to make a new window "activatable." Basically makes it pop to the front when clicked on
   var makeActivatable = function (canvasName) {
     CloudPalette.setActiveImage(canvasName);
     $('.active-window').removeClass('active-window').addClass('inactive-window');
-    $('.canvas-window#window-' + canvasName).addClass('active-window').find('*').mousedown(function () {
+    $('.canvas-window#window-' + canvasName).addClass('active-window')
+    $('.canvas-window#window-' + canvasName).find('*').mousedown(function () {
       $('.active-window').removeClass('active-window').addClass('inactive-window');
       $('.canvas-window#window-' + canvasName).removeClass('inactive-window').addClass('active-window');
       CloudPalette.setActiveImage(canvasName);
-      unbindCanvas($('.inactive-window').find('canvas'));
+      unbindCanvas($('canvas'));
       bindTool($('.active-window').find('canvas'), currentTool);
       activeImage = CloudPalette.getImage(canvasName);
       loadLayers();
