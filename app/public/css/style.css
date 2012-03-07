@@ -87,6 +87,11 @@ body {
 .layer-name {
   margin: 10px 0 0 10px;
   float: left;
+  background: transparent;
+}
+
+.layer-name p {
+  background: transparent;
 }
 
 .header {
@@ -119,6 +124,10 @@ body {
 
 .active-window {
   z-index: 3;
+}
+
+.active-layer {
+  background-color: #D9D9D9;
 }
 
 /* Misc */

@@ -25,8 +25,6 @@ $(function () {
     makeRemovable(canvasName);
     makeActivatable(canvasName);
     activeImage = CloudPalette.getImage(canvasName);
-    activeLayer = activeImage.getActiveLayer();
-    console.log(activeLayer);
     loadLayers();
   };
   
@@ -82,17 +80,17 @@ $(function () {
   };
   
   // function to make ui windows draggable
-  var makeToolsDraggable = function (window, clickzone) {
-    $(window).draggable({ disabled: true });
-    $(window).children(clickzone).mousedown(
+  var makeToolsDraggable = function (dragWindow, clickzone) {
+    $(dragWindow).draggable({ disabled: true });
+    $(dragWindow).children(clickzone).mousedown(
         function () {
-          $(window).draggable('option', 'disabled', false)
+          $(dragWindow).draggable('option', 'disabled', false)
           .trigger('mousedown')
           .css('cursor', 'move');
         }
       ).mouseup(
         function () {
-          $(window).draggable( 'option', 'disabled', true )
+          $(dragWindow).draggable( 'option', 'disabled', true )
           .css('cursor', 'auto');
         }
       );
@@ -103,15 +101,24 @@ $(function () {
     var layers = activeImage.getLayers();
     for (var i = layers.length - 1; i >= 0; i--) {
       $('#layer-container').append(
-        '<div class="layer">' +
+        '<div class="layer" id="layer' + i + '\">' +
           '<div class="layer-picture"></div>' +
           '<div class="layer-name">' +
             '<p>' + layers[i].getName() + '</p>' +
           '</div>' +
         '<div class="clear"></div>'  
       )
-      
+      $('#layer' + activeImage.getActiveLayer()).addClass('active-layer');
+      makeLayerActivatable(i);
     }
+  }
+  
+  var makeLayerActivatable = function (layerNo) {
+    $('#layer' + layerNo).bind('click.activateLayer', function () {
+      activeImage.setActiveLayer(layerNo);
+      $('.active-layer').removeClass('active-layer');
+      $('#layer' + layerNo).addClass('active-layer');
+    });
   }
   
   // gets the context from the canvas element, given the name of the image.
@@ -126,8 +133,20 @@ $(function () {
   
   var bindTool = function (canvas, toolFunction) {
     if(toolFunction){
-     toolFunction(canvas); 
+     toolFunction(canvas);
+     saveLayer(canvas); 
+    } else {
+      throw new Error("That tool is not yet implemented!");
     }
+    
+  };
+  
+  var saveLayer = function (canvas) {
+    canvas.bind('mouseup.saveLayer', function () {
+      var activeImage =  CloudPalette.getActiveImage(),
+      ctx = activeImage.getContext();
+      activeImage.getLayer(activeImage.getActiveLayer()).setData(ctx.getImageData(0,0, activeImage.getWidth(), activeImage.getHeight()));
+    });
   };
   
   var unbindCanvas = function (canvas) {
