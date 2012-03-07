@@ -54,7 +54,15 @@ var CloudPalette = (function () {
         
         this.getContext = function () {
           return ctx;
-        }
+        };
+        
+        this.getActiveLayer = function () {
+          return activeLayer;
+        };
+        
+        this.setActiveLayer = function (a) {
+          activeLayer = a;
+        };
         
         //TODO: Might need to do object/array cloning in the following three functions
         // because the history array is an array of layer objects. Look up the best way

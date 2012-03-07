@@ -25,6 +25,8 @@ $(function () {
     makeRemovable(canvasName);
     makeActivatable(canvasName);
     activeImage = CloudPalette.getImage(canvasName);
+    activeLayer = activeImage.getActiveLayer();
+    console.log(activeLayer);
     loadLayers();
   };
   
@@ -54,7 +56,10 @@ $(function () {
   var makeRemovable = function (canvasName) {
     $('.canvas-window#window-' + canvasName).find('.close').click(
       function () {
-        $('.canvas-window#window-' + canvasName).remove();
+        var close = confirm('are you sure you would like to close (Warning: Your image won\'t be saved!)');
+        if (close) {
+          $('.canvas-window#window-' + canvasName).remove();
+        }
       }
     );
   }
@@ -74,6 +79,23 @@ $(function () {
         .css('cursor', 'auto');
       }
     );
+  };
+  
+  // function to make ui windows draggable
+  var makeToolsDraggable = function (window, clickzone) {
+    $(window).draggable({ disabled: true });
+    $(window).children(clickzone).mousedown(
+        function () {
+          $(window).draggable('option', 'disabled', false)
+          .trigger('mousedown')
+          .css('cursor', 'move');
+        }
+      ).mouseup(
+        function () {
+          $(window).draggable( 'option', 'disabled', true )
+          .css('cursor', 'auto');
+        }
+      );
   };
   
   var loadLayers = function () {
@@ -98,18 +120,6 @@ $(function () {
   var getContext = function (canvasName) {
     return $('.canvas-window#window-' + canvasName).find('#canvas-' + canvasName).get(0).getContext('2d');
   }
-  
-  // Binding for the menu
-  // hover bind to show submenu dropdowns.
-  $('.horizontal-menu-item').hover(
-    function () {
-      $(this).children('.horizontal-submenu').css('display', 'block');
-    },
-    function () {
-      $(this).children('.horizontal-submenu').css('display', 'none');
-    }
-  );
-  
   
   /*********** Tool related functions *************/
   
@@ -153,6 +163,17 @@ $(function () {
   
   /***************** Simple Bindings **********/
   
+  // Binding for the menu
+  // hover bind to show submenu dropdowns.
+  $('.horizontal-menu-item').hover(
+    function () {
+      $(this).children('.horizontal-submenu').css('display', 'block');
+    },
+    function () {
+      $(this).children('.horizontal-submenu').css('display', 'none');
+    }
+  );
+  
   $('#paintbrush').click(function () {
     bindTool($('.active-window').find('canvas'), pencilTool)
     currentTool = pencilTool;
@@ -162,5 +183,8 @@ $(function () {
   $('#new-image').click(createImage);
   
   $('#new-layer').click(newLayer);
+  
+  makeToolsDraggable('#layer-container', '#layer-header');
+  makeToolsDraggable('#toolbar-container', '#toolbar-header');
   
 });
