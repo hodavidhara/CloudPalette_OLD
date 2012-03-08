@@ -19,7 +19,8 @@ var CloudPalette = (function () {
 
         // Create the initial layer
         // TODO: will eventually have to change this to pass in actually data for the second argument.
-        layers.push(new Layer("background", {}));
+        
+        layers.push(new Layer("background", ctx.createImageData(width, height)));
             
         // Image public functions
         // TODO: Should these be added on to the prototype property after the creation??
@@ -55,7 +56,8 @@ var CloudPalette = (function () {
           }
         };
         
-        this.newLayer = function (name, data) {
+        this.newLayer = function (name) {
+          data = ctx.createImageData(width, height)
           layers.push(new Layer(name, data));
         };
         

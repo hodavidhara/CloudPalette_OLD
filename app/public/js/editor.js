@@ -30,7 +30,8 @@ $(function () {
   
   var newLayer = function () {
     var layerName = prompt('What would you like to name your new layer?', 'Untitled-' + (activeImage.getLayers().length));
-    activeImage.newLayer(layerName, {});
+    activeImage.newLayer(layerName);
+    activeImage.setActiveLayer(activeImage.getLayers().length - 1);
     loadLayers();
   }
   
