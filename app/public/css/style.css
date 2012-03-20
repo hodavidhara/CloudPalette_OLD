@@ -73,7 +73,7 @@ body {
   border: 1px solid black;
 }
 
-.layer{
+.layer-box{
   border-bottom: 1px solid black;
 }
 
@@ -112,6 +112,10 @@ body {
 
 .window-menu p {
   padding: 10px 0 10px 10px;
+}
+
+.layer {
+  background: transparent;
 }
 
 .close {

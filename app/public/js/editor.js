@@ -14,25 +14,31 @@ $(function () {
           '<button name="close" class="close">Close!</button>' +
           '<p>'+canvasName+'</p>' +
         '</div>' +
-        '<canvas id="canvas-' + canvasName + '" width="400" height="400">Get a real browser!</canvas>' +
+        '<canvas id="layer-0" class="layer canvas-' + canvasName + '" width="400" height="400">Get a real browser!</canvas>' +
       '</div>'
     );
     var top = 150 + (40 * (CloudPalette.getImageCount() % 10)),
         left = 400 + (40 * (CloudPalette.getImageCount() % 10));
     $('.canvas-window#window-' + canvasName).css({top: (top.toString() + 'px'), left: (left.toString() + 'px')});
-    CloudPalette.newImage(canvasName, getContext(canvasName), 400, 400);
+    CloudPalette.newImage(canvasName, getContext(canvasName, 'layer-0'), 400, 400);
     makeDraggable(canvasName);
     makeRemovable(canvasName);
     makeActivatable(canvasName);
     activeImage = CloudPalette.getImage(canvasName);
-    loadLayers();
+    loadLayerMenu();
   };
   
   var newLayer = function () {
-    var layerName = prompt('What would you like to name your new layer?', 'Untitled-' + (activeImage.getLayers().length));
-    activeImage.newLayer(layerName);
+    var activeImage = CloudPalette.getActiveImage(), 
+        imageName = activeImage.getName(),
+        layerName = prompt('What would you like to name your new layer?', 'layer-' + (activeImage.getLayers().length));
+    $('#window-' + imageName).append(
+      '<canvas id="layer-' + (activeImage.getLayers().length) +'" class="layer canvas-' + imageName + 
+        '" width="400" height="400">Get a real browser!</canvas>'
+    );
+    activeImage.newLayer(layerName, getContext(imageName, layerName));
     activeImage.setActiveLayer(activeImage.getLayers().length - 1);
-    loadLayers();
+    loadLayerMenu();
   }
   
   // function to make a new window "activatable." Basically makes it pop to the front when clicked on
@@ -47,7 +53,7 @@ $(function () {
       unbindCanvas($('canvas'));
       bindTool($('.active-window').find('canvas'), currentTool);
       activeImage = CloudPalette.getImage(canvasName);
-      loadLayers();
+      loadLayerMenu();
     });
   };
   
@@ -97,22 +103,32 @@ $(function () {
       );
   };
   
-  var loadLayers = function () {
-    $('.layer').remove();
-    var layers = activeImage.getLayers();
+  var loadLayerMenu = function () {
+    $('.layer-box').remove();
+    var layers = CloudPalette.getActiveImage().getLayers();
     for (var i = layers.length - 1; i >= 0; i--) {
       $('#layer-container').append(
-        '<div class="layer" id="layer' + i + '\">' +
+        '<div class="layer-box" id="layer' + i + '\">' +
           '<div class="layer-picture"></div>' +
           '<div class="layer-name">' +
             '<p>' + layers[i].getName() + '</p>' +
           '</div>' +
-        '<div class="clear"></div>'  
+        '<div class="clear"></div>'
       )
       $('#layer' + activeImage.getActiveLayer()).addClass('active-layer');
       makeLayerActivatable(i);
     }
-  }
+  };
+  
+  
+  // TODO: See if this works, and if it is even necessary
+  var arrangeLayers = function () {
+    var activeImage = CloudPalette.getActiveImage();
+        imageName = activeImage.getName();
+    $('#window-' + imageName).find('.layer').each(function(i) {
+      this.css('z-index', 4 + i);
+    });
+  };
   
   var makeLayerActivatable = function (layerNo) {
     $('#layer' + layerNo).bind('click.activateLayer', function () {
@@ -125,8 +141,8 @@ $(function () {
   // gets the context from the canvas element, given the name of the image.
   // This should only be used once to get the context from the canvas, then stored in the
   // Image object. From then on we should be using the Images getContext function.
-  var getContext = function (canvasName) {
-    return $('.canvas-window#window-' + canvasName).find('#canvas-' + canvasName).get(0).getContext('2d');
+  var getContext = function (canvasName, layerName) {
+    return $('.canvas-window#window-' + canvasName).find('#' + layerName).get(0).getContext('2d');
   }
   
   /*********** Tool related functions *************/

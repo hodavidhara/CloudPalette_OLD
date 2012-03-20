@@ -8,11 +8,11 @@ var CloudPalette = (function () {
   var CP = {},
   
       // Image prototype.
-      Image = function (c, w, h) {
+      Image = function (n, c, w, h) {
         var layers = [],
             history = [],
             placeInHistory = 0,
-            ctx = c,
+            name = n,
             width = w,
             height = h,
             activeLayer = 0;
@@ -20,7 +20,7 @@ var CloudPalette = (function () {
         // Create the initial layer
         // TODO: will eventually have to change this to pass in actually data for the second argument.
         
-        layers.push(new Layer("background", ctx.createImageData(width, height)));
+        layers.push(new Layer("background", c.createImageData(width, height), c));
             
         // Image public functions
         // TODO: Should these be added on to the prototype property after the creation??
@@ -56,14 +56,14 @@ var CloudPalette = (function () {
           }
         };
         
-        this.newLayer = function (name) {
+        this.newLayer = function (name, ctx) {
           data = ctx.createImageData(width, height)
-          layers.push(new Layer(name, data));
+          layers.push(new Layer(name, data, ctx));
         };
         
-        this.getContext = function () {
-          return ctx;
-        };
+        this.getName = function () {
+          return name;
+        }
         
         this.getActiveLayer = function () {
           return activeLayer;
@@ -94,9 +94,10 @@ var CloudPalette = (function () {
       },
   
       // Layer prototype.
-      Layer = function (n, d) {
+      Layer = function (n, d, c) {
         var name = n,
-            data = d;
+            data = d,
+            ctx = c;
 
         this.getData = function () {
           return data;
@@ -113,12 +114,16 @@ var CloudPalette = (function () {
         this.setName = function (n) {
           name = n;
         }
+        
+        this.getContext = function () {
+          return ctx;
+        };
       };
   var images = {},
       activeImage = undefined;
       
   CP.newImage = function (name, ctx, width, height) {
-    images[name] = new Image(ctx, width, height);
+    images[name] = new Image(name, ctx, width, height);
     return images[name];
   };
       
