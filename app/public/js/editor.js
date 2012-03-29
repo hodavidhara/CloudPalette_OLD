@@ -2,7 +2,8 @@
 // front-end scripts for the CloudPalette editor;
 
 $(function () {
-  var currentTool = null;
+  var currentTool = null,
+      activeImage = null;
   // Function that adds in the new window that contains the canvas, and creates the image object
   // Also calls all of the functions that does most a lot of the bindings.
   var createImage = function () {
@@ -16,22 +17,36 @@ $(function () {
         '<canvas id="canvas-' + canvasName + '" width="400" height="400">Get a real browser!</canvas>' +
       '</div>'
     );
+    var top = 150 + (40 * (CloudPalette.getImageCount() % 10)),
+        left = 400 + (40 * (CloudPalette.getImageCount() % 10));
+    $('.canvas-window#window-' + canvasName).css({top: (top.toString() + 'px'), left: (left.toString() + 'px')});
     CloudPalette.newImage(canvasName, getContext(canvasName), 400, 400);
     makeDraggable(canvasName);
     makeRemovable(canvasName);
-    makeActivatable(canvasName);    
+    makeActivatable(canvasName);
+    activeImage = CloudPalette.getImage(canvasName);
+    loadLayers();
   };
+  
+  var newLayer = function () {
+    var layerName = prompt('What would you like to name your new layer?', 'Untitled-' + (activeImage.getLayers().length));
+    activeImage.newLayer(layerName, {});
+    loadLayers();
+  }
   
   // function to make a new window "activatable." Basically makes it pop to the front when clicked on
   var makeActivatable = function (canvasName) {
     CloudPalette.setActiveImage(canvasName);
     $('.active-window').removeClass('active-window').addClass('inactive-window');
-    $('.canvas-window#window-' + canvasName).addClass('active-window').find('*').mousedown(function () {
+    $('.canvas-window#window-' + canvasName).addClass('active-window')
+    $('.canvas-window#window-' + canvasName).find('*').mousedown(function () {
       $('.active-window').removeClass('active-window').addClass('inactive-window');
       $('.canvas-window#window-' + canvasName).removeClass('inactive-window').addClass('active-window');
       CloudPalette.setActiveImage(canvasName);
-      unbindCanvas($('.inactive-window').find('canvas'));
+      unbindCanvas($('canvas'));
       bindTool($('.active-window').find('canvas'), currentTool);
+      activeImage = CloudPalette.getImage(canvasName);
+      loadLayers();
     });
   };
   
@@ -39,7 +54,10 @@ $(function () {
   var makeRemovable = function (canvasName) {
     $('.canvas-window#window-' + canvasName).find('.close').click(
       function () {
-        $('.canvas-window#window-' + canvasName).remove();
+        var close = confirm('are you sure you would like to close (Warning: Your image won\'t be saved!)');
+        if (close) {
+          $('.canvas-window#window-' + canvasName).remove();
+        }
       }
     );
   }
@@ -61,6 +79,48 @@ $(function () {
     );
   };
   
+  // function to make ui windows draggable
+  var makeToolsDraggable = function (dragWindow, clickzone) {
+    $(dragWindow).draggable({ disabled: true });
+    $(dragWindow).children(clickzone).mousedown(
+        function () {
+          $(dragWindow).draggable('option', 'disabled', false)
+          .trigger('mousedown')
+          .css('cursor', 'move');
+        }
+      ).mouseup(
+        function () {
+          $(dragWindow).draggable( 'option', 'disabled', true )
+          .css('cursor', 'auto');
+        }
+      );
+  };
+  
+  var loadLayers = function () {
+    $('.layer').remove();
+    var layers = activeImage.getLayers();
+    for (var i = layers.length - 1; i >= 0; i--) {
+      $('#layer-container').append(
+        '<div class="layer" id="layer' + i + '\">' +
+          '<div class="layer-picture"></div>' +
+          '<div class="layer-name">' +
+            '<p>' + layers[i].getName() + '</p>' +
+          '</div>' +
+        '<div class="clear"></div>'  
+      )
+      $('#layer' + activeImage.getActiveLayer()).addClass('active-layer');
+      makeLayerActivatable(i);
+    }
+  }
+  
+  var makeLayerActivatable = function (layerNo) {
+    $('#layer' + layerNo).bind('click.activateLayer', function () {
+      activeImage.setActiveLayer(layerNo);
+      $('.active-layer').removeClass('active-layer');
+      $('#layer' + layerNo).addClass('active-layer');
+    });
+  }
+  
   // gets the context from the canvas element, given the name of the image.
   // This should only be used once to get the context from the canvas, then stored in the
   // Image object. From then on we should be using the Images getContext function.
@@ -68,27 +128,32 @@ $(function () {
     return $('.canvas-window#window-' + canvasName).find('#canvas-' + canvasName).get(0).getContext('2d');
   }
   
-  // Binding for the menu
-  // hover bind to show submenu dropdowns.
-  $('.horizontal-menu-item').hover(
-    function () {
-      $(this).children('.horizontal-submenu').css('display', 'block');
-    },
-    function () {
-      $(this).children('.horizontal-submenu').css('display', 'none');
-    }
-  );
+  /*********** Tool related functions *************/
+  
   
   var bindTool = function (canvas, toolFunction) {
     if(toolFunction){
-     toolFunction(canvas); 
+     toolFunction(canvas);
+     saveLayer(canvas); 
+    } else {
+      throw new Error("That tool is not yet implemented!");
     }
+    
+  };
+  
+  var saveLayer = function (canvas) {
+    canvas.bind('mouseup.saveLayer', function () {
+      var activeImage =  CloudPalette.getActiveImage(),
+      ctx = activeImage.getContext();
+      activeImage.getLayer(activeImage.getActiveLayer()).setData(ctx.getImageData(0,0, activeImage.getWidth(), activeImage.getHeight()));
+    });
   };
   
   var unbindCanvas = function (canvas) {
     canvas.unbind('.tool');
   };
   
+  // This is the pencil tool
   var pencilTool = function (canvas) {
     var ctx = CloudPalette.getActiveImage().getContext();
     canvas.bind('mousedown.tool', function (event) {
@@ -115,6 +180,19 @@ $(function () {
       
   };
   
+  /***************** Simple Bindings **********/
+  
+  // Binding for the menu
+  // hover bind to show submenu dropdowns.
+  $('.horizontal-menu-item').hover(
+    function () {
+      $(this).children('.horizontal-submenu').css('display', 'block');
+    },
+    function () {
+      $(this).children('.horizontal-submenu').css('display', 'none');
+    }
+  );
+  
   $('#paintbrush').click(function () {
     bindTool($('.active-window').find('canvas'), pencilTool)
     currentTool = pencilTool;
@@ -122,5 +200,10 @@ $(function () {
   
   // click binding for all the submenu items.
   $('#new-image').click(createImage);
+  
+  $('#new-layer').click(newLayer);
+  
+  makeToolsDraggable('#layer-container', '#layer-header');
+  makeToolsDraggable('#toolbar-container', '#toolbar-header');
   
 });

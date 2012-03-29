@@ -22,13 +22,20 @@ var CloudPalette = (function () {
         layers.push(new Layer("background", {}));
             
         // Image public functions
-        // TODO: Should these be added on to the prototype property after?
+        // TODO: Should these be added on to the prototype property after the creation??
+        
+        this.getWidth = function () {
+          return width;
+        }
+        
+        this.getHeight = function () {
+          return height;
+        }
         
         this.getLayers = function () {
           return layers;
         };
         
-        // TODO: rewrite so that users can lookup by layer name OR index.
         this.getLayer = function (lookup) {
           if (typeof lookup === 'string') {
             for (var i = 0; i < layers.length; i ++) {
@@ -54,7 +61,15 @@ var CloudPalette = (function () {
         
         this.getContext = function () {
           return ctx;
-        }
+        };
+        
+        this.getActiveLayer = function () {
+          return activeLayer;
+        };
+        
+        this.setActiveLayer = function (a) {
+          activeLayer = a;
+        };
         
         //TODO: Might need to do object/array cloning in the following three functions
         // because the history array is an array of layer objects. Look up the best way
