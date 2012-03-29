@@ -138,3 +138,41 @@ body {
   -moz-border-radius-topright: 5px;
   border-top-right-radius: 5px;
 }
+
+/* Index */
+
+#splashdash {
+  position: absolute;
+  top: 135px;
+  left: 400px;
+}
+
+#create-text {
+  position: absolute;
+  top: 135px;
+  left: 500px;
+  color: #6dadd5;
+  font-size: 15px;
+  font-family: Georgia, serif;
+}
+
+#create {
+  position: absolute;
+  top: 215px;
+  left: 500px;
+}
+
+#code-text {
+  position: absolute;
+  top: 135px;
+  left: 750px;
+  color: #6dadd5;
+  font-size: 15px;
+  font-family: Georgia, serif; 
+}
+
+#code {
+  position: absolute;
+  top: 215px;
+  left: 750px;
+}
