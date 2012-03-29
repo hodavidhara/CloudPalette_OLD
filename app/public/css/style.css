@@ -149,11 +149,12 @@ body {
 
 #create-text {
   position: absolute;
-  top: 135px;
+  top: 125px;
   left: 500px;
   color: #6dadd5;
   font-size: 15px;
   font-family: Georgia, serif;
+  width: 150px;
 }
 
 #create {
@@ -164,11 +165,12 @@ body {
 
 #code-text {
   position: absolute;
-  top: 135px;
+  top: 125px;
   left: 750px;
   color: #6dadd5;
   font-size: 15px;
-  font-family: Georgia, serif; 
+  font-family: Georgia, serif;
+  width: 150px; 
 }
 
 #code {
