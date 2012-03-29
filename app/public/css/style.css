@@ -116,6 +116,7 @@ body {
 
 .layer {
   background: transparent;
+  position: absolute;
 }
 
 .close {
