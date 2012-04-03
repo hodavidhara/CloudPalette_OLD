@@ -29,6 +29,7 @@ $(function () {
     makeActivatable(canvasName);
     activeImage = CloudPalette.getImage(canvasName);
     loadLayerMenu();
+    arrangeLayers();
   };
   
   var newLayer = function () {
@@ -129,13 +130,7 @@ $(function () {
         imageName = activeImage.getName();
     $('#window-' + imageName).find('.layer').each(function(i) {
       $(this).css('z-index', i.toString())
-      .bind('click', function () {
-        console.log('clicked layer: ' + i);
-      });
     });
-//    $('#window-' + imageName).find('.canvas-holder').bind('click.propagateClick', function () {
-//      $('.layer').trigger('click');
-//    });
   };
   
   var makeLayerActivatable = function (layerNo) {
