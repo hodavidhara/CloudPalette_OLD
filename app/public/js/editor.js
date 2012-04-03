@@ -8,28 +8,30 @@ $(function () {
   // Also calls all of the functions that does most a lot of the bindings.
   var createImage = function () {
     var canvasName = prompt('What would you like to name your Image?', 'Untitled-' + (CloudPalette.getImageCount()+1));
-    $('body').append(
-      '<div id="window-' + canvasName + '" class="canvas-window">' +
-        '<div class="window-menu">' +
-          '<button name="close" class="close">Close!</button>' +
-          '<p>'+canvasName+'</p>' +
-        '</div>' +
-        '<div class="canvas-holder">' +
-          '<canvas id="layer-0" class="layer canvas-' + canvasName + '" width="400" height="400">Get a real browser!</canvas>' +
-        '</div>' +
-      '</div>'
-    );
-    var top = 150 + (40 * (CloudPalette.getImageCount() % 10)),
-        left = 400 + (40 * (CloudPalette.getImageCount() % 10));
-    $('.canvas-window#window-' + canvasName).css({top: (top.toString() + 'px'), left: (left.toString() + 'px')});
-    $('.canvas-window#window-' + canvasName).find('.canvas-holder').css({height: '400px', width: '400px'})
-    CloudPalette.newImage(canvasName, getContext(canvasName, 'layer-0'), 400, 400);
-    makeDraggable(canvasName);
-    makeRemovable(canvasName);
-    makeActivatable(canvasName);
-    activeImage = CloudPalette.getImage(canvasName);
-    loadLayerMenu();
-    arrangeLayers();
+    if (canvasName !== null) {
+      $('body').append(
+        '<div id="window-' + canvasName + '" class="canvas-window">' +
+          '<div class="window-menu">' +
+            '<button name="close" class="close">Close!</button>' +
+            '<p>'+canvasName+'</p>' +
+          '</div>' +
+          '<div class="canvas-holder">' +
+            '<canvas id="layer-0" class="layer canvas-' + canvasName + '" width="400px" height="400px">Get a real browser!</canvas>' +
+          '</div>' +
+        '</div>'
+      );
+      var top = 150 + (40 * (CloudPalette.getImageCount() % 10)),
+          left = 400 + (40 * (CloudPalette.getImageCount() % 10));
+      $('.canvas-window#window-' + canvasName).css({top: (top.toString() + 'px'), left: (left.toString() + 'px')});
+      $('.canvas-window#window-' + canvasName).find('.canvas-holder').css({height: '400px', width: '400px'});
+      CloudPalette.newImage(canvasName, getContext(canvasName, 'layer-0'), 400, 400);
+      makeDraggable(canvasName);
+      makeRemovable(canvasName);
+      makeActivatable(canvasName);
+      activeImage = CloudPalette.getImage(canvasName);
+      loadLayerMenu();
+      arrangeLayers();
+    }
   };
   
   var newLayer = function () {
@@ -55,8 +57,7 @@ $(function () {
       $('.active-window').removeClass('active-window').addClass('inactive-window');
       $('.canvas-window#window-' + canvasName).removeClass('inactive-window').addClass('active-window');
       CloudPalette.setActiveImage(canvasName);
-      unbindCanvas($('canvas'));
-      bindTool($('.active-window').find('canvas'), currentTool);
+      bindTool($('.active-window').find('.canvas-holder'), currentTool);
       activeImage = CloudPalette.getImage(canvasName);
       loadLayerMenu();
     });
@@ -138,6 +139,7 @@ $(function () {
       activeImage.setActiveLayer(layerNo);
       $('.active-layer').removeClass('active-layer');
       $('#layer' + layerNo).addClass('active-layer');
+      bindTool($('.active-window').find('.canvas-holder'), currentTool);
     });
   }
   
@@ -151,35 +153,43 @@ $(function () {
   /*********** Tool related functions *************/
   
   
-  var bindTool = function (canvas, toolFunction) {
+  var bindTool = function (canvasHolder, toolFunction) {
     if(toolFunction){
-     toolFunction(canvas);
-     saveLayer(canvas); 
+      unbindCanvas(canvasHolder);
+      toolFunction(canvasHolder);
+      bindSave(canvasHolder); 
     } else {
       throw new Error("That tool is not yet implemented!");
     }
     
   };
   
-  var saveLayer = function (canvas) {
-    canvas.bind('mouseup.saveLayer', function () {
-      var activeImage =  CloudPalette.getActiveImage(),
-      ctx = activeImage.getContext();
-      activeImage.getLayer(activeImage.getActiveLayer()).setData(ctx.getImageData(0,0, activeImage.getWidth(), activeImage.getHeight()));
+  var bindSave = function (canvasHolder) {
+    canvasHolder.bind('mouseup.saveLayer', function () {
+      var activeImage = CloudPalette.getActiveImage(),
+      activeLayer = activeImage.getLayer(activeImage.getActiveLayer()),
+      ctx = activeLayer.getContext();
+      activeLayer.setData(ctx.getImageData(0,0, activeImage.getWidth(), activeImage.getHeight()));
+      console.log('layerName: ' + activeLayer.getName());
+      console.log('layerData:');
+      console.log(activeLayer.getData());
     });
   };
   
-  var unbindCanvas = function (canvas) {
-    canvas.unbind('.tool');
+  var unbindCanvas = function (canvasHolder) {
+    canvasHolder.unbind('.tool');
+    canvasHolder.unbind('.saveLayer');
   };
   
   // This is the pencil tool
-  var pencilTool = function (canvas) {
-    var ctx = CloudPalette.getActiveImage().getContext();
-    canvas.bind('mousedown.tool', function (event) {
+  var pencilTool = function (canvasHolder) {
+    var activeImage = CloudPalette.getActiveImage(),
+    activeLayer = activeImage.getLayer(activeImage.getActiveLayer()),
+    ctx = activeLayer.getContext();
+    canvasHolder.bind('mousedown.tool', function (event) {
       var oldX = event.offsetX,
           oldY = event.offsetY;
-      canvas.mousemove(function (event) {
+      canvasHolder.bind('mousemove.tool', function (event) {
           //canvasUtil.fillCircle(ctx, event.offsetX, event.offsetY, 5);
         if(oldX !== null && oldY !== null) {
           ctx.beginPath();
@@ -195,7 +205,7 @@ $(function () {
       });
     });
     $(window).mouseup(function (event) {
-      canvas.unbind('mousemove');
+      canvasHolder.unbind('mousemove');
     });
       
   };
@@ -214,7 +224,7 @@ $(function () {
   );
   
   $('#paintbrush').click(function () {
-    bindTool($('.active-window').find('canvas'), pencilTool)
+    bindTool($('.active-window').find('.canvas-holder'), pencilTool)
     currentTool = pencilTool;
   });
   
