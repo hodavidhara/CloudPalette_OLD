@@ -7,7 +7,7 @@ $(function () {
   // Function that adds in the new window that contains the canvas, and creates the image object
   // Also calls all of the functions that does most a lot of the bindings.
   var createImage = function () {
-    var canvasName = prompt('What would you like to name your Image?', 'Untitled-' + (CloudPalette.getImageCount()+1));
+    var canvasName = prompt('What would you like to name your image?', 'Untitled-' + (CloudPalette.getImageCount()+1));
     if (canvasName !== null) {
       $('body').append(
         '<div id="window-' + canvasName + '" class="canvas-window">' +
