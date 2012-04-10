@@ -18,7 +18,6 @@ var CloudPalette = (function () {
             activeLayer = 0;
 
         // Create the initial layer
-        // TODO: will eventually have to change this to pass in actually data for the second argument.
         
         layers.push(new Layer("background", c.createImageData(width, height), c));
             

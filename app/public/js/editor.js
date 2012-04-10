@@ -141,14 +141,14 @@ $(function () {
       $('#layer' + layerNo).addClass('active-layer');
       bindTool($('.active-window').find('.canvas-holder'), currentTool);
     });
-  }
+  };
   
   var flattenActiveImage = function () {
     var activeImage = CloudPalette.getActiveImage(),
         imageName = activeImage.getName(),
         activeLayer, ctx;
     
-    CloudPalette.getActiveImage().flattenImage();
+    activeImage.flattenImage();
     activeLayer = activeImage.getLayer(activeImage.getActiveLayer()),
     ctx = activeLayer.getContext();
     ctx.putImageData(activeLayer.getData(), 0, 0);
@@ -158,14 +158,25 @@ $(function () {
       }      
     });
     loadLayerMenu();
-  }
+  };
   
   // gets the context from the canvas element, given the name of the image.
   // This should only be used once to get the context from the canvas, then stored in the
   // Image object. From then on we should be using the Images getContext function.
   var getContext = function (canvasName, layerName) {
     return $('.canvas-window#window-' + canvasName).find('#' + layerName).get(0).getContext('2d');
-  }
+  };
+  
+  var saveImage = function () {
+    var activeImage = CloudPalette.getActiveImage(),
+        imageName = activeImage.getName();
+    
+    flattenActiveImage();
+    var canvas = $('#window-' + imageName).find('#layer-0').get(0),
+        canvasData = canvas.toDataURL("image/png");
+    
+    window.open(canvasData);
+  };
   
   /*********** Tool related functions *************/
   
@@ -174,14 +185,14 @@ $(function () {
     if(toolFunction){
       unbindCanvas(canvasHolder);
       toolFunction(canvasHolder);
-      bindSave(canvasHolder); 
+      bindSaveLayer(canvasHolder); 
     } else {
       throw new Error("That tool is not yet implemented!");
     }
     
   };
   
-  var bindSave = function (canvasHolder) {
+  var bindSaveLayer = function (canvasHolder) {
     canvasHolder.bind('mouseup.saveLayer', function () {
       var activeImage = CloudPalette.getActiveImage(),
           activeLayer = activeImage.getLayer(activeImage.getActiveLayer()),
@@ -245,6 +256,7 @@ $(function () {
   
   // click binding for all the submenu items.
   $('#new-image').click(createImage);
+  $('#save-image').click(saveImage);
   
   $('#new-layer').click(newLayer);
   
