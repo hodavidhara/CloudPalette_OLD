@@ -79,17 +79,52 @@ var CloudPalette = (function () {
         this.recordHistory = function () {
           placeInHistory++;
           history[placeInHistory] = layers;          
-        }
+        };
         
         this.undo = function () {
           placeInHistory--;
           layers = history[placeInHistory];
-        }
+        };
         
         this.redo = function () {
           placeInHistory++;
           layers = history[placeInHistory];
-        }
+        };
+        
+        this.mergeLayers = function (bottomLayerIndex, topLayerIndex) {
+          var topLayerData = layers[topLayerIndex].getData(),
+              bottomLayerData = layers[bottomLayerIndex].getData(),
+              newData = layers[bottomLayerIndex].getContext().createImageData(width, height);
+              
+          for (var i = 0; i * 4 < newData.data.length; i++) {
+            
+            // If the top layer has any 'empty' pixels, place the bottom layer pixels into the new image data. Else just use the top layers pixels.
+            if (topLayerData.data[i*4] === 0 && topLayerData.data[(i*4) + 1] === 0 && topLayerData.data[(i*4) + 2] === 0 && topLayerData.data[(i*4) + 3] === 0) {
+              newData.data[i*4] = bottomLayerData.data[i*4];
+              newData.data[(i*4) + 1] = bottomLayerData.data[(i*4) + 1];
+              newData.data[(i*4) + 2] = bottomLayerData.data[(i*4) + 2];
+              newData.data[(i*4) + 3] = bottomLayerData.data[(i*4) + 3];
+            } else {
+              newData.data[i*4] = topLayerData.data[i*4];
+              newData.data[(i*4) + 1] = topLayerData.data[(i*4) + 1];
+              newData.data[(i*4) + 2] = topLayerData.data[(i*4) + 2];
+              newData.data[(i*4) + 3] = topLayerData.data[(i*4) + 3];
+            }
+          }
+          
+          layers[bottomLayerIndex].setData(newData);
+          layers.splice(topLayerIndex, 1);
+          if (activeLayer === topLayerIndex) {
+            activeLayer = bottomLayerIndex;
+          }
+        };
+        
+        this.flattenImage = function () {
+          for (var i = layers.length - 1; i > 0 ; i--) {
+            this.mergeLayers(i - 1, i);
+          }
+          activeLayer = 0;          
+        };
         
       },
   

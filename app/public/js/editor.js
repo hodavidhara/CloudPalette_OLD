@@ -127,7 +127,7 @@ $(function () {
   };
   
   var arrangeLayers = function () {
-    var activeImage = CloudPalette.getActiveImage();
+    var activeImage = CloudPalette.getActiveImage(),
         imageName = activeImage.getName();
     $('#window-' + imageName).find('.layer').each(function(i) {
       $(this).css('z-index', i.toString())
@@ -141,6 +141,23 @@ $(function () {
       $('#layer' + layerNo).addClass('active-layer');
       bindTool($('.active-window').find('.canvas-holder'), currentTool);
     });
+  }
+  
+  var flattenActiveImage = function () {
+    var activeImage = CloudPalette.getActiveImage(),
+        imageName = activeImage.getName(),
+        activeLayer, ctx;
+    
+    CloudPalette.getActiveImage().flattenImage();
+    activeLayer = activeImage.getLayer(activeImage.getActiveLayer()),
+    ctx = activeLayer.getContext();
+    ctx.putImageData(activeLayer.getData(), 0, 0);
+    $('#window-' + imageName).find('.layer').each(function(i) {
+      if (i !== 0) {
+        $('#window-' + imageName).find('#layer-' + i).remove();
+      }      
+    });
+    loadLayerMenu();
   }
   
   // gets the context from the canvas element, given the name of the image.
@@ -167,12 +184,10 @@ $(function () {
   var bindSave = function (canvasHolder) {
     canvasHolder.bind('mouseup.saveLayer', function () {
       var activeImage = CloudPalette.getActiveImage(),
-      activeLayer = activeImage.getLayer(activeImage.getActiveLayer()),
-      ctx = activeLayer.getContext();
+          activeLayer = activeImage.getLayer(activeImage.getActiveLayer()),
+          ctx = activeLayer.getContext();
       activeLayer.setData(ctx.getImageData(0,0, activeImage.getWidth(), activeImage.getHeight()));
-      console.log('layerName: ' + activeLayer.getName());
-      console.log('layerData:');
-      console.log(activeLayer.getData());
+      activeImage.recordHistory();
     });
   };
   
@@ -232,6 +247,8 @@ $(function () {
   $('#new-image').click(createImage);
   
   $('#new-layer').click(newLayer);
+  
+  $('#flatten-image').click(flattenActiveImage);
   
   makeToolsDraggable('#layer-container', '#layer-header');
   makeToolsDraggable('#toolbar-container', '#toolbar-header');
