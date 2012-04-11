@@ -261,10 +261,14 @@ $(function () {
   $('#save-image').click(saveImage);
   
   $('#new-layer').click(newLayer);
-  
   $('#flatten-image').click(flattenActiveImage);
+  
+  $('#color-toolbar').click(function () {
+    $('#color-container').toggle();
+  })
   
   makeToolsDraggable('#layer-container', '#layer-header');
   makeToolsDraggable('#toolbar-container', '#toolbar-header');
+  makeToolsDraggable('#color-container', '#color-header');
   
 });

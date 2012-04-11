@@ -94,6 +94,50 @@ body {
   background: transparent;
 }
 
+#color-container {
+  visibility: visible;
+  position: fixed;
+  top: 550px;
+  left: 50px;
+  z-index: 4;
+  border: 1px solid black;
+}
+
+.color {
+  width: 40px;
+  height: 40px;
+  float: left;
+}
+
+#red {
+  background: #FF0000;
+}
+
+#orange {
+  background: #FFA500;
+}
+
+#yellow {
+  background: #FFFF00;
+}
+
+#green {
+  background: #00FF00;
+}
+
+#blue {
+  background: #0000FF;
+}
+
+#purple {
+  background: #800080;
+}
+
+#custom-color {
+  margin: 0;
+  width: 100%;
+}
+
 .header {
   padding: 10px;
   text-align: center;

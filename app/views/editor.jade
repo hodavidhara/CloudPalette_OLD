@@ -32,6 +32,11 @@ html(lang="en")
             li.horizontal-submenu-item#flatten-image
               p Flatten Image
         li.horizontal-menu-item
+          p Toolbars
+          ul.horizontal-submenu
+            li.horizontal-submenu-item#color-toolbar
+              p colors
+        li.horizontal-menu-item
           p.bottom-right-radius Help
         .clear
     #toolbar-container
@@ -41,3 +46,13 @@ html(lang="en")
     #layer-container
       .header#layer-header
         p layers
+    #color-container
+      .header#color-header
+        p colors
+      .color#red
+      .color#orange
+      .color#yellow
+      .color#green
+      .color#blue
+      .color#purple
+      button#custom-color choose a custom color
