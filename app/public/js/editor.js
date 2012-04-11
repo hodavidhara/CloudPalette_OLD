@@ -46,6 +46,7 @@ $(function () {
     activeImage.setActiveLayer(activeImage.getLayers().length - 1);
     loadLayerMenu();
     arrangeLayers();
+    bindTool($('#window-' + imageName).find('.canvas-holder'), currentTool);
   }
   
   // function to make a new window "activatable." Basically makes it pop to the front when clicked on
@@ -184,19 +185,20 @@ $(function () {
   var bindTool = function (canvasHolder, toolFunction) {
     if(toolFunction){
       unbindCanvas(canvasHolder);
+      bindSaveLayer(); 
       toolFunction(canvasHolder);
-      bindSaveLayer(canvasHolder); 
     } else {
       throw new Error("That tool is not yet implemented!");
     }
     
   };
   
-  var bindSaveLayer = function (canvasHolder) {
-    canvasHolder.bind('mouseup.saveLayer', function () {
+  var bindSaveLayer = function () {
+    $(window).bind('mouseup.saveLayer', function () {
       var activeImage = CloudPalette.getActiveImage(),
           activeLayer = activeImage.getLayer(activeImage.getActiveLayer()),
           ctx = activeLayer.getContext();
+      
       activeLayer.setData(ctx.getImageData(0,0, activeImage.getWidth(), activeImage.getHeight()));
       activeImage.recordHistory();
     });
@@ -204,7 +206,7 @@ $(function () {
   
   var unbindCanvas = function (canvasHolder) {
     canvasHolder.unbind('.tool');
-    canvasHolder.unbind('.saveLayer');
+    $(window).unbind('mouseup.saveLayer');
   };
   
   // This is the pencil tool
@@ -226,11 +228,11 @@ $(function () {
         oldX = event.offsetX;
         oldY = event.offsetY;
       })
-      .mouseleave(function (event) {
+      .bind('mouseleave.tool', function (event) {
         oldX = oldY = null;
       });
     });
-    $(window).mouseup(function (event) {
+    $(window).bind('mouseup.tool', function (event) {
       canvasHolder.unbind('mousemove');
     });
       

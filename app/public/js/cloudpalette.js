@@ -97,13 +97,15 @@ var CloudPalette = (function () {
               
           for (var i = 0; i * 4 < newData.data.length; i++) {
             
-            // If the top layer has any 'empty' pixels, place the bottom layer pixels into the new image data. Else just use the top layers pixels.
-            if (topLayerData.data[i*4] === 0 && topLayerData.data[(i*4) + 1] === 0 && topLayerData.data[(i*4) + 2] === 0 && topLayerData.data[(i*4) + 3] === 0) {
               newData.data[i*4] = bottomLayerData.data[i*4];
               newData.data[(i*4) + 1] = bottomLayerData.data[(i*4) + 1];
               newData.data[(i*4) + 2] = bottomLayerData.data[(i*4) + 2];
               newData.data[(i*4) + 3] = bottomLayerData.data[(i*4) + 3];
-            } else {
+            // If the top layer has any 'empty' pixels, place the bottom layer pixels into the new image data. Else just use the top layers pixels.
+            if (topLayerData.data[(i*4) + 3] !== 0) {
+              console.log('alpha at: ' + topLayerData.data[(i*4) + 3]);
+            }
+            if (topLayerData.data[i*4] !== 0 || topLayerData.data[(i*4) + 1] !== 0 || topLayerData.data[(i*4) + 2] !== 0 || topLayerData.data[(i*4) + 3] !== 0) {              
               newData.data[i*4] = topLayerData.data[i*4];
               newData.data[(i*4) + 1] = topLayerData.data[(i*4) + 1];
               newData.data[(i*4) + 2] = topLayerData.data[(i*4) + 2];
