@@ -7,10 +7,13 @@ html(lang="en")
     script(type='text/javascript', src='/js/util/canvasUtil.js')
     script(type='text/javascript', src='/js/canvasDemo.js')    
   body
-    h1 CloudPalette
-    p CloudPalette is an image editor on the web.
-    p check out the 
-      a(href='/editor') editor
-      |  or see the code on
-      a(href='https://github.com/hodavidhara/CloudPalette') github
-      | .
+    img(src='/assets/images/CloudPaletteLogo.png')
+    img#splashdash(src='/assets/images/splashpagedash.png')
+    p#create-text
+      | CloudPalette is an online image editor. Test it out!
+    a#create(href='/editor')
+      img(src='/assets/images/create.png')
+    p#code-text
+      | Check out the code on github.
+    a#code(href='https://github.com/hodavidhara/CloudPalette')
+      img(src='/assets/images/code.png')
