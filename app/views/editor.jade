@@ -8,6 +8,7 @@ html(lang="en")
     script(type='text/javascript', src='/js/lib/jquery-ui-1.8.17.custom.min.js')
     script(type='text/javascript', src='/js/cloudpalette.js')
     script(type='text/javascript', src='/js/editor.js')
+    script(type='text/javascript', src='/js/util/canvasUtil.js')
   body
     #menu-bar
       ul.horizontal-menu.bottom-right-radius
@@ -42,13 +43,18 @@ html(lang="en")
     #toolbar-container
       .header#toolbar-header
         p tools
-      button#paintbrush(name='paintbrush') PaintBrush!
+      button#pencil(name='pencil') pencil!
+      #current-color-header
+        p current color
+      #current-color
     #layer-container
       .header#layer-header
         p layers
     #color-container
       .header#color-header
         p colors
+      .color#white
+      .color#black
       .color#red
       .color#orange
       .color#yellow

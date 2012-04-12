@@ -3,6 +3,7 @@
 
 $(function () {
   var currentTool = null,
+      activeColor = 'rgb(0, 0, 0)',
       activeImage = null;
   // Function that adds in the new window that contains the canvas, and creates the image object
   // Also calls all of the functions that does most a lot of the bindings.
@@ -27,6 +28,7 @@ $(function () {
       CloudPalette.newImage(canvasName, getContext(canvasName, 'layer-0'), 400, 400);
       makeDraggable(canvasName);
       makeRemovable(canvasName);
+      currentTool = (currentTool === null) ? pencilTool : currentTool;
       makeActivatable(canvasName);
       activeImage = CloudPalette.getImage(canvasName);
       loadLayerMenu();
@@ -209,11 +211,19 @@ $(function () {
     $(window).unbind('mouseup.saveLayer');
   };
   
+  var bindColorPickers = function () {
+    activeColor = $(this).css('background-color');
+    
+    $('#current-color').css('background-color', activeColor);
+  }
+  
   // This is the pencil tool
   var pencilTool = function (canvasHolder) {
     var activeImage = CloudPalette.getActiveImage(),
     activeLayer = activeImage.getLayer(activeImage.getActiveLayer()),
     ctx = activeLayer.getContext();
+    ctx.fillStyle = activeColor;
+    ctx.strokeStyle = activeColor;
     canvasHolder.bind('mousedown.tool', function (event) {
       var oldX = event.offsetX,
           oldY = event.offsetY;
@@ -251,7 +261,7 @@ $(function () {
     }
   );
   
-  $('#paintbrush').click(function () {
+  $('#pencil').click(function () {
     bindTool($('.active-window').find('.canvas-holder'), pencilTool)
     currentTool = pencilTool;
   });
@@ -266,6 +276,8 @@ $(function () {
   $('#color-toolbar').click(function () {
     $('#color-container').toggle();
   })
+  
+  $('.color').bind('click.colorSelect', bindColorPickers);
   
   makeToolsDraggable('#layer-container', '#layer-header');
   makeToolsDraggable('#toolbar-container', '#toolbar-header');
