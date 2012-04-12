@@ -94,6 +94,71 @@ body {
   background: transparent;
 }
 
+#color-container {
+  visibility: visible;
+  position: fixed;
+  top: 550px;
+  left: 50px;
+  z-index: 4;
+  border: 1px solid black;
+}
+
+.color {
+  width: 40px;
+  height: 40px;
+  float: left;
+}
+
+#black {
+  background-color: #000000;
+}
+
+#white {
+  background-color: #FFFFFF;
+}
+
+#red {
+  background-color: #FF0000;
+}
+
+#orange {
+  background-color: #FFA500;
+}
+
+#yellow {
+  background-color: #FFFF00;
+}
+
+#green {
+  background-color: #00FF00;
+}
+
+#blue {
+  background-color: #0000FF;
+}
+
+#purple {
+  background-color: #800080;
+}
+
+#custom-color {
+  margin: 0;
+  width: 100%;
+}
+
+#current-color-header {
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  width: 100%;
+  text-align: center;
+}
+
+#current-color {
+  width: 100%;
+  height: 40px;
+  background-color: #000000;
+}
+
 .header {
   padding: 10px;
   text-align: center;
