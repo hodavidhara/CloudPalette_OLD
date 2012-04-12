@@ -163,40 +163,41 @@ body {
 
 /* Index */
 
-#splashdash {
-  position: absolute;
-  top: 135px;
-  left: 400px;
+#index-wrapper {
+  width: 900px;
+  margin: 100px auto 0 auto;
+}
+
+#splash-logo {
+  float: left;
+}
+
+#splash-dash {
+  float: left;
+  margin: 125px 0 0 75px;
+}
+
+#create {
+  float: left;
+  margin: 125px 0 0 75px;
 }
 
 #create-text {
-  position: absolute;
-  top: 125px;
-  left: 500px;
   color: #6dadd5;
   font-size: 15px;
   font-family: Georgia, serif;
   width: 150px;
 }
 
-#create {
-  position: absolute;
-  top: 215px;
-  left: 500px;
+#code {
+  float: left;
+  margin: 125px 0 0 75px;
 }
 
 #code-text {
-  position: absolute;
-  top: 125px;
-  left: 750px;
   color: #6dadd5;
   font-size: 15px;
   font-family: Georgia, serif;
   width: 150px; 
-}
-
-#code {
-  position: absolute;
-  top: 215px;
-  left: 750px;
+  margin-bottom: 35px;
 }
