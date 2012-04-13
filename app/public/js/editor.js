@@ -262,7 +262,7 @@ $(function () {
   );
   
   $('#pencil').click(function () {
-    bindTool($('.active-window').find('.canvas-holder'), pencilTool)
+    bindTool($('.active-window').find('.canvas-holder'), pencilTool);
     currentTool = pencilTool;
   });
   
@@ -277,7 +277,16 @@ $(function () {
     $('#color-container').toggle();
   })
   
-  $('.color').bind('click.colorSelect', bindColorPickers);
+  
+  //Color selection handling
+  $('.color-swab').bind('click.colorSelect', bindColorPickers);
+  $('input.color').miniColors({
+    change: function(hex, rgb) {
+      activeColor = canvasUtil.hexToRGBString(hex);    
+      $('#current-color').css('background-color', activeColor);
+    }
+  });
+  $('.miniColors-trigger').bind('click.colorSelect', bindColorPickers);
   
   makeToolsDraggable('#layer-container', '#layer-header');
   makeToolsDraggable('#toolbar-container', '#toolbar-header');

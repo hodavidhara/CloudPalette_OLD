@@ -6,6 +6,7 @@ html(lang="en")
     link(rel='stylesheet', type='text/css', href='/css/style.css')
     script(type='text/javascript', src='/js/lib/jquery-1.7.1.min.js')
     script(type='text/javascript', src='/js/lib/jquery-ui-1.8.17.custom.min.js')
+    script(type='text/javascript', src='/js/lib/jquery.miniColors.min.js')
     script(type='text/javascript', src='/js/cloudpalette.js')
     script(type='text/javascript', src='/js/editor.js')
     script(type='text/javascript', src='/js/util/canvasUtil.js')
@@ -53,12 +54,13 @@ html(lang="en")
     #color-container
       .header#color-header
         p colors
-      .color#white
-      .color#black
-      .color#red
-      .color#orange
-      .color#yellow
-      .color#green
-      .color#blue
-      .color#purple
-      button#custom-color choose a custom color
+      .color-swab#white
+      .color-swab#black
+      .color-swab#red
+      .color-swab#orange
+      .color-swab#yellow
+      .color-swab#green
+      .color-swab#blue
+      .color-swab#purple
+      label custom colors: 
+        input.color
