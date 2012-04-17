@@ -4,6 +4,24 @@
  * The file where the magic happens.
  */
 
+var deepCopy = function (obj) {
+    if (Object.prototype.toString.call(obj) === '[object Array]') {
+        var out = [], i = 0, len = obj.length;
+        for ( ; i < len; i++ ) {
+            out[i] = arguments.callee(obj[i]);
+        }
+        return out;
+    }
+    if (typeof obj === 'object') {
+        var out = {}, i;
+        for ( i in obj ) {
+            out[i] = arguments.callee(obj[i]);
+        }
+        return out;
+    }
+    return obj;
+};
+
 var CloudPalette = (function () {
   var CP = {},
   
@@ -15,11 +33,13 @@ var CloudPalette = (function () {
             name = n,
             width = w,
             height = h,
-            activeLayer = 0;
+            activeLayer = 0,
+            recentlyEdited = false;
 
         // Create the initial layer
         
         layers.push(new Layer("background", c.createImageData(width, height), c));
+        history[0] = deepCopy(layers);
             
         // Image public functions
         // TODO: Should these be added on to the prototype property after the creation??
@@ -35,6 +55,10 @@ var CloudPalette = (function () {
         this.getLayers = function () {
           return layers;
         };
+        
+        this.getHistory = function () {
+          return history;
+        }
         
         this.getLayer = function (lookup) {
           if (typeof lookup === 'string') {
@@ -72,22 +96,48 @@ var CloudPalette = (function () {
           activeLayer = a;
         };
         
-        //TODO: Might need to do object/array cloning in the following three functions
-        // because the history array is an array of layer objects. Look up the best way
-        // to clone arrays of objects.
+        this.getEdited = function () {
+          return recentlyEdited;
+        };
+        
+        this.setEdited = function (r) {
+          recentlyEdited = r;
+        };
+        
+        this.cloneLayers = function () {
+          var clonedLayers = [];
+          for (var i = 0; i < layers.length; i++) {
+            clonedLayers[i] = layers[i].clone();
+          }
+          return clonedLayers;
+        }
+        
         this.recordHistory = function () {
           placeInHistory++;
-          history[placeInHistory] = layers;          
+          history[placeInHistory] = this.cloneLayers();
+          //remove unnecessary history
+          history.splice(placeInHistory+1);
         };
         
         this.undo = function () {
           placeInHistory--;
-          layers = history[placeInHistory];
+          if(history[placeInHistory]){
+            layers = deepCopy(history[placeInHistory]);
+            activeLayer = layers.length - 1;
+          } else {
+            placeInHistory++;
+            throw new Error('there is no history to undo');
+          }
         };
         
         this.redo = function () {
           placeInHistory++;
-          layers = history[placeInHistory];
+          if(history[placeInHistory]){
+            layers = deepCopy(history[placeInHistory]);
+          } else {
+            placeInHistory--;
+            throw new Error('there is no history to redo');
+          }
         };
         
         this.mergeLayers = function (bottomLayerIndex, topLayerIndex) {
@@ -151,6 +201,10 @@ var CloudPalette = (function () {
         this.getContext = function () {
           return ctx;
         };
+        
+        this.clone = function () {
+          return new Layer(name, deepCopy(data), ctx);
+        }
       };
   var images = {},
       activeImage = undefined;

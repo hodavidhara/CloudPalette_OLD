@@ -345,3 +345,10 @@ body {
   width: 150px; 
   margin-bottom: 35px;
 }
+
+#tempcanvas {
+  position: fixed;
+  top: 100px;
+  left: 800px;
+  border: 1px solid black;
+}

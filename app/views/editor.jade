@@ -20,17 +20,18 @@ html(lang="en")
               p New Image
             li.horizontal-submenu-item#save-image
               p Save Image
-            li.horizontal-submenu-item#load-image
-              p Load Image
         li.horizontal-menu-item
           p Edit
+          ul.horizontal-submenu
+            li.horizontal-submenu-item#undo
+              p Undo
+            li.horizontal-submenu-item#redo
+              p Redo
         li.horizontal-menu-item
           p Layers
           ul.horizontal-submenu
             li.horizontal-submenu-item#new-layer
               p New Layer
-            li.horizontal-submenu-item#delete-layer
-              p Delete Layer
             li.horizontal-submenu-item#flatten-image
               p Flatten Image
         li.horizontal-menu-item
@@ -64,3 +65,4 @@ html(lang="en")
       .color-swab#purple
       label custom colors: 
         input.color
+    canvas#tempcanvas(width='400px', height='400px')
