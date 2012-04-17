@@ -103,39 +103,71 @@ body {
   border: 1px solid black;
 }
 
-.color {
+.color-swab {
   width: 40px;
   height: 40px;
   float: left;
+  border-bottom: 1px solid black;
+}
+
+#slide {
+  width: 30px;
+  height: 200px;
+}
+
+#picker {
+  width: 200px;
+  height: 200px;
+}
+
+#black {
+  background-color: #000000;
+}
+
+#white {
+  background-color: #FFFFFF;
 }
 
 #red {
-  background: #FF0000;
+  background-color: #FF0000;
 }
 
 #orange {
-  background: #FFA500;
+  background-color: #FFA500;
 }
 
 #yellow {
-  background: #FFFF00;
+  background-color: #FFFF00;
 }
 
 #green {
-  background: #00FF00;
+  background-color: #00FF00;
 }
 
 #blue {
-  background: #0000FF;
+  background-color: #0000FF;
 }
 
 #purple {
-  background: #800080;
+  background-color: #800080;
 }
 
 #custom-color {
   margin: 0;
   width: 100%;
+}
+
+#current-color-header {
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  width: 100%;
+  text-align: center;
+}
+
+#current-color {
+  width: 100%;
+  height: 40px;
+  background-color: #000000;
 }
 
 .header {
@@ -205,42 +237,111 @@ body {
   border-top-right-radius: 5px;
 }
 
+/* Color Picker! */
+
+.miniColors-trigger {
+  height: 22px;
+  width: 22px;
+  background: url(../assets/images/miniColors/trigger.png) center no-repeat;
+  vertical-align: middle;
+  margin: 0 .25em;
+  display: inline-block;
+  outline: none;
+}
+
+.miniColors-selector {
+  position: absolute;
+  width: 175px;
+  height: 150px;
+  background: #FFF;
+  border: solid 1px #BBB;
+  -moz-box-shadow: 0 0 6px rgba(0, 0, 0, .25);
+  -webkit-box-shadow: 0 0 6px rgba(0, 0, 0, .25);
+  box-shadow: 0 0 6px rgba(0, 0, 0, .25);
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  padding: 5px;
+  z-index: 999999;
+}
+
+.miniColors-selector.black {
+  background: #000;
+  border-color: #000;
+}
+
+.miniColors-colors {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 150px;
+  height: 150px;
+  background: url(../assets/images/miniColors/gradient.png) center no-repeat;
+  cursor: crosshair;
+}
+
+.miniColors-hues {
+  position: absolute;
+  top: 5px;
+  left: 160px;
+  width: 20px;
+  height: 150px;
+  background: url(../assets/images/miniColors/rainbow.png) center no-repeat;
+  cursor: crosshair;
+}
+
+.miniColors-colorPicker {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  background: url(../assets/images/miniColors/circle.gif) center no-repeat;
+}
+
+.miniColors-huePicker {
+  position: absolute;
+  left: -3px;
+  width: 26px;
+  height: 3px;
+  background: url(../assets/images/miniColors/line.gif) center no-repeat;
+}
+
 /* Index */
 
-#splashdash {
-  position: absolute;
-  top: 135px;
-  left: 400px;
+#index-wrapper {
+  width: 900px;
+  margin: 100px auto 0 auto;
+}
+
+#splash-logo {
+  float: left;
+}
+
+#splash-dash {
+  float: left;
+  margin: 125px 0 0 75px;
+}
+
+#create {
+  float: left;
+  margin: 125px 0 0 75px;
 }
 
 #create-text {
-  position: absolute;
-  top: 125px;
-  left: 500px;
   color: #6dadd5;
   font-size: 15px;
   font-family: Georgia, serif;
   width: 150px;
 }
 
-#create {
-  position: absolute;
-  top: 215px;
-  left: 500px;
+#code {
+  float: left;
+  margin: 125px 0 0 75px;
 }
 
 #code-text {
-  position: absolute;
-  top: 125px;
-  left: 750px;
   color: #6dadd5;
   font-size: 15px;
   font-family: Georgia, serif;
   width: 150px; 
-}
-
-#code {
-  position: absolute;
-  top: 215px;
-  left: 750px;
+  margin-bottom: 35px;
 }

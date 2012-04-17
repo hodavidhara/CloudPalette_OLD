@@ -7,13 +7,16 @@ html(lang="en")
     script(type='text/javascript', src='/js/util/canvasUtil.js')
     script(type='text/javascript', src='/js/canvasDemo.js')    
   body
-    img(src='/assets/images/CloudPaletteLogo.png')
-    img#splashdash(src='/assets/images/splashpagedash.png')
-    p#create-text
-      | CloudPalette is an online image editor. Test it out!
-    a#create(href='/editor')
-      img(src='/assets/images/create.png')
-    p#code-text
-      | Check out the code on github.
-    a#code(href='https://github.com/hodavidhara/CloudPalette')
-      img(src='/assets/images/code.png')
+    #index-wrapper
+      img#splash-logo(src='/assets/images/CloudPaletteLogo.png')
+      img#splash-dash(src='/assets/images/splashpagedash.png')
+      #create
+        p#create-text
+          | CloudPalette is an online image editor. Test it out!
+        a#create-pic(href='/editor')
+          img(src='/assets/images/create.png')
+      #code
+        p#code-text
+          | Check out the code on github.
+        a#code-pic(href='https://github.com/hodavidhara/CloudPalette')
+          img(src='/assets/images/code.png')

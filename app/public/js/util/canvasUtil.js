@@ -49,6 +49,17 @@ var canvasUtil = function () {
         strokeEllipse: function (ctx, x, y, r) {
             canvasUtil.drawCircle(ctx, x, y, r);
             ctx.stroke();
+        },
+        
+        hexToRGBString: function (hex) {
+          var rgbString = 'rgb(';
+          
+          hex = (hex.charAt(0)=="#") ? hex.substring(1,7) : hex;
+          rgbString = rgbString + parseInt((hex).substring(0,2),16) + ',';
+          rgbString = rgbString + parseInt((hex).substring(2,4),16) + ',';
+          rgbString = rgbString + parseInt((hex).substring(4,6),16);
+          
+          return rgbString + ')';
         }
     };
 }();
