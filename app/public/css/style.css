@@ -95,7 +95,6 @@ body {
 }
 
 #color-container {
-  visibility: visible;
   position: fixed;
   top: 550px;
   left: 50px;
@@ -108,16 +107,22 @@ body {
   height: 40px;
   float: left;
   border-bottom: 1px solid black;
+  cursor: pointer;
 }
 
-#slide {
-  width: 30px;
-  height: 200px;
+#brush-size-container {
+  position: fixed;
+  top: 550px;
+  left: 400px;
+  z-index: 4;
+  border: 1px solid black;
 }
 
-#picker {
-  width: 200px;
-  height: 200px;
+.brush-size {
+  width: 40px;
+  height: 40px;
+  float: left;
+  cursor: pointer;
 }
 
 #black {
