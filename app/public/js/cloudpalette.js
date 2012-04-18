@@ -92,7 +92,7 @@ var CloudPalette = (function () {
             clonedLayers[i] = layers[i].clone();
           }
           return clonedLayers;
-        }
+        };
         
         this.cloneHistory = function (time) {
           var clonedHistory = [];
@@ -101,7 +101,17 @@ var CloudPalette = (function () {
             clonedHistory[i] = history[time][i].clone();
           }
           return clonedHistory;
-        }
+        };
+        
+        this.updateHistoryCtxForLayer = function (layerNumber) {
+          var ctx = layers[layerNumber].getContext();
+          console.log(history);
+          for (var i = 0; i < history.length; i++) {
+            if (history[i][layerNumber]) {
+              history[i][layerNumber].setContext(ctx);
+            }
+          }
+        };
         
         this.recordHistory = function () {
           placeInHistory++;
@@ -192,6 +202,10 @@ var CloudPalette = (function () {
         this.getContext = function () {
           return ctx;
         };
+        
+        this.setContext = function (c) {
+          ctx = c;
+        }
         
         this.clone = function () {
           var newData = ctx.createImageData(data.width, data.height);

@@ -25,7 +25,7 @@ $(function () {
           left = 400 + (40 * (CloudPalette.getImageCount() % 10));
       $('.canvas-window#window-' + canvasName).css({top: (top.toString() + 'px'), left: (left.toString() + 'px')});
       $('.canvas-window#window-' + canvasName).find('.canvas-holder').css({height: '400px', width: '400px'});
-      CloudPalette.newImage(canvasName, getContext(canvasName, 'layer-0'), 400, 400);
+      CloudPalette.newImage(canvasName, getContext(canvasName, 0), 400, 400);
       makeDraggable(canvasName);
       makeRemovable(canvasName);
       currentTool = (currentTool === null) ? pencilTool : currentTool;
@@ -42,9 +42,9 @@ $(function () {
         layerName = prompt('What would you like to name your new layer?', 'layer-' + (activeImage.getLayers().length));
     $('#window-' + imageName).find('.canvas-holder').append(
       '<canvas id="layer-' + (activeImage.getLayers().length) +'" class="layer canvas-' + imageName + 
-        '" width="400" height="400">Get a real browser!</canvas>'
+        '" width="400px" height="400px">Get a real browser!</canvas>'
     );
-    activeImage.newLayer(layerName, getContext(imageName, layerName));
+    activeImage.newLayer(layerName, getContext(imageName, activeImage.getLayers().length));
     activeImage.setActiveLayer(activeImage.getLayers().length - 1);
     activeImage.recordHistory();
     loadLayerMenu();
@@ -169,6 +169,18 @@ $(function () {
     ctx;
     
     for (var i = 0; i < layers.length; i++) {
+      if($('#window-' + imageName).find('#layer-'+i).size() === 0) {
+        $('#window-' + imageName).find('.canvas-holder').append(
+          '<canvas id="layer-' + i +'" class="layer canvas-' + imageName + 
+            '" width="400px" height="400px">Get a real browser!</canvas>'
+        );
+        var newctx = getContext(imageName, i)
+        layers[i].setContext(newctx);
+        activeImage.updateHistoryCtxForLayer(i);
+        activeImage.setActiveLayer(i);
+        arrangeLayers();
+        bindTool($('#window-' + imageName).find('.canvas-holder'), currentTool);
+      }
       ctx = layers[i].getContext();
       ctx.putImageData(layers[i].getData(), 0, 0);
     }
@@ -178,14 +190,15 @@ $(function () {
         $('#window-' + imageName).find('#layer-' + i).remove();
       }      
     });
+    
     loadLayerMenu();
   }
   
   // gets the context from the canvas element, given the name of the image.
   // This should only be used once to get the context from the canvas, then stored in the
   // Image object. From then on we should be using the Images getContext function.
-  var getContext = function (canvasName, layerName) {
-    return $('.canvas-window#window-' + canvasName).find('#' + layerName).get(0).getContext('2d');
+  var getContext = function (canvasName, layerNumber) {
+    return $('.canvas-window#window-' + canvasName).find('#layer-' + layerNumber).get(0).getContext('2d');
   };
   
   var saveImage = function () {
