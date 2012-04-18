@@ -15,11 +15,13 @@ var CloudPalette = (function () {
             name = n,
             width = w,
             height = h,
-            activeLayer = 0;
+            activeLayer = 0,
+            recentlyEdited = false;
 
         // Create the initial layer
         
         layers.push(new Layer("background", c.createImageData(width, height), c));
+        history[0] = [layers[0].clone()]; 
             
         // Image public functions
         // TODO: Should these be added on to the prototype property after the creation??
@@ -35,6 +37,10 @@ var CloudPalette = (function () {
         this.getLayers = function () {
           return layers;
         };
+        
+        this.getHistory = function () {
+          return history;
+        }
         
         this.getLayer = function (lookup) {
           if (typeof lookup === 'string') {
@@ -72,22 +78,66 @@ var CloudPalette = (function () {
           activeLayer = a;
         };
         
-        //TODO: Might need to do object/array cloning in the following three functions
-        // because the history array is an array of layer objects. Look up the best way
-        // to clone arrays of objects.
+        this.getEdited = function () {
+          return recentlyEdited;
+        };
+        
+        this.setEdited = function (r) {
+          recentlyEdited = r;
+        };
+        
+        this.cloneLayers = function () {
+          var clonedLayers = [];
+          for (var i = 0; i < layers.length; i++) {
+            clonedLayers[i] = layers[i].clone();
+          }
+          return clonedLayers;
+        };
+        
+        this.cloneHistory = function (time) {
+          var clonedHistory = [];
+          
+          for (var i = 0; i < history[time].length; i++) {
+            clonedHistory[i] = history[time][i].clone();
+          }
+          return clonedHistory;
+        };
+        
+        this.updateHistoryCtxForLayer = function (layerNumber) {
+          var ctx = layers[layerNumber].getContext();
+          for (var i = 0; i < history.length; i++) {
+            if (history[i][layerNumber]) {
+              history[i][layerNumber].setContext(ctx);
+            }
+          }
+        };
+        
         this.recordHistory = function () {
           placeInHistory++;
-          history[placeInHistory] = layers;          
+          history[placeInHistory] = this.cloneLayers();
+          //remove unnecessary history
+          history.splice(placeInHistory+1);
         };
         
         this.undo = function () {
           placeInHistory--;
-          layers = history[placeInHistory];
+          if(history[placeInHistory]){
+            layers = this.cloneHistory(placeInHistory);
+            activeLayer = layers.length - 1;
+          } else {
+            placeInHistory++;
+            throw new Error('there is no history to undo');
+          }
         };
         
         this.redo = function () {
           placeInHistory++;
-          layers = history[placeInHistory];
+          if(history[placeInHistory]){
+            layers = this.cloneHistory(placeInHistory);
+          } else {
+            placeInHistory--;
+            throw new Error('there is no history to redo');
+          }
         };
         
         this.mergeLayers = function (bottomLayerIndex, topLayerIndex) {
@@ -151,6 +201,19 @@ var CloudPalette = (function () {
         this.getContext = function () {
           return ctx;
         };
+        
+        this.setContext = function (c) {
+          ctx = c;
+        }
+        
+        this.clone = function () {
+          var newData = ctx.createImageData(data.width, data.height);
+          
+          for (var i = 0; i < data.data.length; i++) {
+            newData.data[i] = data.data[i];
+          }          
+          return new Layer(name, newData, ctx);
+        }
       };
   var images = {},
       activeImage = undefined;
@@ -168,7 +231,7 @@ var CloudPalette = (function () {
     if (images[name]) {
       return images[name];
     } else {
-      console.error("No image with the name " + name + " exists.");
+      throw new Error("No image with the name " + name + " exists.");
     }
   };
   
@@ -184,7 +247,7 @@ var CloudPalette = (function () {
     if (images[newActive]) {
       activeImage = images[newActive];
     } else {
-      console.error("No image with the name " + newActive + " exists.");
+      throw new Error("No image with the name " + newActive + " exists.");
     }
   };
   
@@ -194,4 +257,5 @@ var CloudPalette = (function () {
 }());
 
   // export as a node-module for unit testing.
+  // WARNING: this will cause an error in the browser, but should be ignorable
   module.exports = CloudPalette;

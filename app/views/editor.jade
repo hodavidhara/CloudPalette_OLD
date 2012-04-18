@@ -20,17 +20,18 @@ html(lang="en")
               p New Image
             li.horizontal-submenu-item#save-image
               p Save Image
-            li.horizontal-submenu-item#load-image
-              p Load Image
         li.horizontal-menu-item
           p Edit
+          ul.horizontal-submenu
+            li.horizontal-submenu-item#undo
+              p Undo (Ctrl + z)
+            li.horizontal-submenu-item#redo
+              p Redo (Ctrl + Shift + z)
         li.horizontal-menu-item
           p Layers
           ul.horizontal-submenu
             li.horizontal-submenu-item#new-layer
               p New Layer
-            li.horizontal-submenu-item#delete-layer
-              p Delete Layer
             li.horizontal-submenu-item#flatten-image
               p Flatten Image
         li.horizontal-menu-item
@@ -76,3 +77,4 @@ html(lang="en")
       .brush-size#size-16 16
       .brush-size#size-32 32
       .brush-size#size-64 64
+

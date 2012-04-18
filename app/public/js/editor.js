@@ -6,6 +6,7 @@ $(function () {
       activeColor = 'rgb(0, 0, 0)',
       activeBrushSize = '1',
       activeImage = null;
+      keypressStates = {ctrl: false, alt: false, shift: false};
   // Function that adds in the new window that contains the canvas, and creates the image object
   // Also calls all of the functions that does most a lot of the bindings.
   var createImage = function () {
@@ -26,7 +27,7 @@ $(function () {
           left = 400 + (40 * (CloudPalette.getImageCount() % 10));
       $('.canvas-window#window-' + canvasName).css({top: (top.toString() + 'px'), left: (left.toString() + 'px')});
       $('.canvas-window#window-' + canvasName).find('.canvas-holder').css({height: '400px', width: '400px'});
-      CloudPalette.newImage(canvasName, getContext(canvasName, 'layer-0'), 400, 400);
+      CloudPalette.newImage(canvasName, getContext(canvasName, 0), 400, 400);
       makeDraggable(canvasName);
       makeRemovable(canvasName);
       currentTool = (currentTool === null) ? pencilTool : currentTool;
@@ -43,10 +44,11 @@ $(function () {
         layerName = prompt('What would you like to name your new layer?', 'layer-' + (activeImage.getLayers().length));
     $('#window-' + imageName).find('.canvas-holder').append(
       '<canvas id="layer-' + (activeImage.getLayers().length) +'" class="layer canvas-' + imageName + 
-        '" width="400" height="400">Get a real browser!</canvas>'
+        '" width="400px" height="400px">Get a real browser!</canvas>'
     );
-    activeImage.newLayer(layerName, getContext(imageName, layerName));
+    activeImage.newLayer(layerName, getContext(imageName, activeImage.getLayers().length));
     activeImage.setActiveLayer(activeImage.getLayers().length - 1);
+    activeImage.recordHistory();
     loadLayerMenu();
     arrangeLayers();
     bindTool($('#window-' + imageName).find('.canvas-holder'), currentTool);
@@ -153,22 +155,52 @@ $(function () {
         activeLayer, ctx;
     
     activeImage.flattenImage();
-    activeLayer = activeImage.getLayer(activeImage.getActiveLayer()),
-    ctx = activeLayer.getContext();
-    ctx.putImageData(activeLayer.getData(), 0, 0);
     $('#window-' + imageName).find('.layer').each(function(i) {
       if (i !== 0) {
         $('#window-' + imageName).find('#layer-' + i).remove();
       }      
     });
+    updateCanvasFromLayerData();
     loadLayerMenu();
   };
+  
+  var updateCanvasFromLayerData = function () {
+    var activeImage = CloudPalette.getActiveImage(),
+    imageName = activeImage.getName(),
+    layers = activeImage.getLayers(),
+    ctx;
+    
+    for (var i = 0; i < layers.length; i++) {
+      if($('#window-' + imageName).find('#layer-'+i).size() === 0) {
+        $('#window-' + imageName).find('.canvas-holder').append(
+          '<canvas id="layer-' + i +'" class="layer canvas-' + imageName + 
+            '" width="400px" height="400px">Get a real browser!</canvas>'
+        );
+        var newctx = getContext(imageName, i)
+        layers[i].setContext(newctx);
+        activeImage.updateHistoryCtxForLayer(i);
+        activeImage.setActiveLayer(i);
+        arrangeLayers();
+        bindTool($('#window-' + imageName).find('.canvas-holder'), currentTool);
+      }
+      ctx = layers[i].getContext();
+      ctx.putImageData(layers[i].getData(), 0, 0);
+    }
+    
+    $('#window-' + imageName).find('.layer').each(function(i) {
+      if (i >= layers.length) {
+        $('#window-' + imageName).find('#layer-' + i).remove();
+      }      
+    });
+    
+    loadLayerMenu();
+  }
   
   // gets the context from the canvas element, given the name of the image.
   // This should only be used once to get the context from the canvas, then stored in the
   // Image object. From then on we should be using the Images getContext function.
-  var getContext = function (canvasName, layerName) {
-    return $('.canvas-window#window-' + canvasName).find('#' + layerName).get(0).getContext('2d');
+  var getContext = function (canvasName, layerNumber) {
+    return $('.canvas-window#window-' + canvasName).find('#layer-' + layerNumber).get(0).getContext('2d');
   };
   
   var saveImage = function () {
@@ -181,6 +213,20 @@ $(function () {
     
     window.open(canvasData);
   };
+  
+  var undoImage = function () {
+    var activeImage = CloudPalette.getActiveImage();
+    activeImage.undo();
+    
+    updateCanvasFromLayerData();
+  }
+  
+  var redoImage = function () {
+    var activeImage = CloudPalette.getActiveImage();
+    activeImage.redo();
+    
+    updateCanvasFromLayerData();
+  }
   
   /*********** Tool related functions *************/
   
@@ -201,9 +247,11 @@ $(function () {
       var activeImage = CloudPalette.getActiveImage(),
           activeLayer = activeImage.getLayer(activeImage.getActiveLayer()),
           ctx = activeLayer.getContext();
-      
-      activeLayer.setData(ctx.getImageData(0,0, activeImage.getWidth(), activeImage.getHeight()));
-      activeImage.recordHistory();
+      if(activeImage.getEdited()){
+        activeLayer.setData(ctx.getImageData(0,0, activeImage.getWidth(), activeImage.getHeight()));
+        activeImage.recordHistory();
+      }
+      activeImage.setEdited(false);
     });
   };
   
@@ -232,6 +280,7 @@ $(function () {
     canvasHolder.bind('mousedown.tool', function (event) {
       var oldX = event.offsetX,
           oldY = event.offsetY;
+      activeImage.setEdited(true);
       canvasHolder.bind('mousemove.tool', function (event) {
           //canvasUtil.fillCircle(ctx, event.offsetX, event.offsetY, 5);
         if(oldX !== null && oldY !== null) {
@@ -248,7 +297,8 @@ $(function () {
       });
     });
     $(window).bind('mouseup.tool', function (event) {
-      canvasHolder.unbind('mousemove');
+      canvasHolder.unbind('mousemove.tool');
+      $(window).unbind('.tool');
     });
       
   };
@@ -274,6 +324,9 @@ $(function () {
   // click binding for all the submenu items.
   $('#new-image').click(createImage);
   $('#save-image').click(saveImage);
+  
+  $('#undo').click(undoImage);
+  $('#redo').click(redoImage);
   
   $('#new-layer').click(newLayer);
   $('#flatten-image').click(flattenActiveImage);
@@ -305,4 +358,48 @@ $(function () {
   makeToolsDraggable('#color-container', '#color-header');
   makeToolsDraggable('#brush-size-container', '#brush-size-header');
   
+  // **************************** KEYPRESS BINDINGS ************************** \\
+  
+  $(window).bind('keydown', function (event) {
+    switch (event.which) {
+      // shift
+      case 16:
+        keypressStates.shift = true;
+        break;
+      // ctrl
+      case 17:
+        keypressStates.ctrl = true;
+        break;
+      // alt
+      case 18:
+        keypressStates.alt = true;
+        break;
+      // Z
+      case 90:
+        if (keypressStates.shift && keypressStates.ctrl) {
+          redoImage();
+        } else if (keypressStates.ctrl) {
+          undoImage();
+        }
+        break;
+      default:
+    }
+  })
+  .bind('keyup', function (event) {
+    switch (event.which) {
+      // shift
+      case 16:
+        keypressStates.shift = false;
+        break;
+      // ctrl
+      case 17:
+        keypressStates.ctrl = false;
+        break;
+      // alt
+      case 18:
+        keypressStates.alt = false;
+        break;
+      default:
+    }
+  });
 });
