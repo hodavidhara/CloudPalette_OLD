@@ -4,24 +4,6 @@
  * The file where the magic happens.
  */
 
-var deepCopy = function (obj) {
-    if (Object.prototype.toString.call(obj) === '[object Array]') {
-        var out = [], i = 0, len = obj.length;
-        for ( ; i < len; i++ ) {
-            out[i] = arguments.callee(obj[i]);
-        }
-        return out;
-    }
-    if (typeof obj === 'object') {
-        var out = {}, i;
-        for ( i in obj ) {
-            out[i] = arguments.callee(obj[i]);
-        }
-        return out;
-    }
-    return obj;
-};
-
 var CloudPalette = (function () {
   var CP = {},
   
@@ -39,7 +21,7 @@ var CloudPalette = (function () {
         // Create the initial layer
         
         layers.push(new Layer("background", c.createImageData(width, height), c));
-        history[0] = deepCopy(layers);
+        history[0] = [layers[0].clone()]; 
             
         // Image public functions
         // TODO: Should these be added on to the prototype property after the creation??
@@ -112,6 +94,15 @@ var CloudPalette = (function () {
           return clonedLayers;
         }
         
+        this.cloneHistory = function (time) {
+          var clonedHistory = [];
+          
+          for (var i = 0; i < history[time].length; i++) {
+            clonedHistory[i] = history[time][i].clone();
+          }
+          return clonedHistory;
+        }
+        
         this.recordHistory = function () {
           placeInHistory++;
           history[placeInHistory] = this.cloneLayers();
@@ -122,7 +113,7 @@ var CloudPalette = (function () {
         this.undo = function () {
           placeInHistory--;
           if(history[placeInHistory]){
-            layers = deepCopy(history[placeInHistory]);
+            layers = this.cloneHistory(placeInHistory);
             activeLayer = layers.length - 1;
           } else {
             placeInHistory++;
@@ -133,7 +124,7 @@ var CloudPalette = (function () {
         this.redo = function () {
           placeInHistory++;
           if(history[placeInHistory]){
-            layers = deepCopy(history[placeInHistory]);
+            layers = this.cloneHistory(placeInHistory);
           } else {
             placeInHistory--;
             throw new Error('there is no history to redo');
@@ -203,7 +194,12 @@ var CloudPalette = (function () {
         };
         
         this.clone = function () {
-          return new Layer(name, deepCopy(data), ctx);
+          var newData = ctx.createImageData(data.width, data.height);
+          
+          for (var i = 0; i < data.data.length; i++) {
+            newData.data[i] = data.data[i];
+          }          
+          return new Layer(name, newData, ctx);
         }
       };
   var images = {},
@@ -222,7 +218,7 @@ var CloudPalette = (function () {
     if (images[name]) {
       return images[name];
     } else {
-      console.error("No image with the name " + name + " exists.");
+      throw new Error("No image with the name " + name + " exists.");
     }
   };
   
@@ -238,7 +234,7 @@ var CloudPalette = (function () {
     if (images[newActive]) {
       activeImage = images[newActive];
     } else {
-      console.error("No image with the name " + newActive + " exists.");
+      throw new Error("No image with the name " + newActive + " exists.");
     }
   };
   
