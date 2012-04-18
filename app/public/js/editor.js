@@ -5,6 +5,7 @@ $(function () {
   var currentTool = null,
       activeColor = 'rgb(0, 0, 0)',
       activeImage = null;
+      keypressStates = {ctrl: false, alt: false, shift: false};
   // Function that adds in the new window that contains the canvas, and creates the image object
   // Also calls all of the functions that does most a lot of the bindings.
   var createImage = function () {
@@ -344,4 +345,48 @@ $(function () {
   makeToolsDraggable('#toolbar-container', '#toolbar-header');
   makeToolsDraggable('#color-container', '#color-header');
   
+  // **************************** KEYPRESS BINDINGS ************************** \\
+  
+  $(window).bind('keydown', function (event) {
+    switch (event.which) {
+      // shift
+      case 16:
+        keypressStates.shift = true;
+        break;
+      // ctrl
+      case 17:
+        keypressStates.ctrl = true;
+        break;
+      // alt
+      case 18:
+        keypressStates.alt = true;
+        break;
+      // Z
+      case 90:
+        if (keypressStates.shift && keypressStates.ctrl) {
+          redoImage();
+        } else if (keypressStates.ctrl) {
+          undoImage();
+        }
+        break;
+      default:
+    }
+  })
+  .bind('keyup', function (event) {
+    switch (event.which) {
+      // shift
+      case 16:
+        keypressStates.shift = false;
+        break;
+      // ctrl
+      case 17:
+        keypressStates.ctrl = false;
+        break;
+      // alt
+      case 18:
+        keypressStates.alt = false;
+        break;
+      default:
+    }
+  });
 });

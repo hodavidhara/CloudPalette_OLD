@@ -105,7 +105,6 @@ var CloudPalette = (function () {
         
         this.updateHistoryCtxForLayer = function (layerNumber) {
           var ctx = layers[layerNumber].getContext();
-          console.log(history);
           for (var i = 0; i < history.length; i++) {
             if (history[i][layerNumber]) {
               history[i][layerNumber].setContext(ctx);
@@ -258,4 +257,5 @@ var CloudPalette = (function () {
 }());
 
   // export as a node-module for unit testing.
+  // WARNING: this will cause an error in the browser, but should be ignorable
   module.exports = CloudPalette;
