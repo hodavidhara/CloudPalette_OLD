@@ -10,7 +10,7 @@ $(function () {
   // Function that adds in the new window that contains the canvas, and creates the image object
   // Also calls all of the functions that does most a lot of the bindings.
   var createImage = function () {
-    var canvasName = prompt('What would you like to name your image?', 'Untitled-' + (CloudPalette.getImageCount()+1));
+    var canvasName = $('#new-image-form-name').val();
     if (canvasName !== null) {
       $('body').append(
         '<div id="window-' + canvasName + '" class="canvas-window">' +
@@ -316,7 +316,33 @@ $(function () {
     }
   };
   
-  /***************** Simple Bindings **********/
+    // ********************** Popups Setup ******************** \\
+  
+  var openNewImageForm = function () {
+    $('#new-image-form').dialog('open');
+    $('#new-image-form-name').val('Untitled-' + (CloudPalette.getImageCount()+1));
+    $('.ui-dialog-buttonset > button:last').focus();
+  };
+  
+  $('#new-image-form').dialog({
+      autoOpen: false,
+      height: 300,
+      width: 350,
+      modal: true,
+      resizable: false,
+      draggable: false,
+      buttons: {
+        Cancel: function() {
+          $( this ).dialog('close');
+        },
+        'Ok': function () {
+          createImage();
+          $(this).dialog('close');
+        }
+      }
+    });
+  
+  //***************** Simple Bindings ********** \\
   
   // Binding for the menu
   // hover bind to show submenu dropdowns.
@@ -335,7 +361,7 @@ $(function () {
   });
   
   // click binding for all the submenu items.
-  $('#new-image').click(createImage);
+  $('#new-image').click(openNewImageForm);
   $('#save-image').click(saveImage);
   
   $('#undo').click(undoImage);

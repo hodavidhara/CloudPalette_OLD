@@ -4,6 +4,7 @@ html(lang="en")
     title CloudPalette
     link(rel='stylesheet', type='text/css', href='/css/reset.css')
     link(rel='stylesheet', type='text/css', href='/css/style.css')
+    link(rel='stylesheet', type='text/css', href='/css/jquery-ui-1.8.19.custom.css')
     script(type='text/javascript', src='/js/lib/jquery-1.7.1.min.js')
     script(type='text/javascript', src='/js/lib/jquery-ui-1.8.17.custom.min.js')
     script(type='text/javascript', src='/js/lib/jquery.miniColors.min.js')
@@ -84,4 +85,15 @@ html(lang="en")
         p 32
       .brush-size#size-64
         p 64
-
+        
+    #new-image-form(title='Create a new image')
+      form
+        fieldset
+          label(for='new-image-form-name') name: 
+          input#new-image-form-name(type='text')
+          .clear
+          label(for='new-image-form-width') width: 
+          input#new-image-form-width(type='text')
+          .clear
+          label(for='new-image-form-height') height: 
+          input#new-image-form-height(type='text')
