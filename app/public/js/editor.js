@@ -276,31 +276,44 @@ $(function () {
     activeLayer = activeImage.getLayer(activeImage.getActiveLayer()),
     ctx = activeLayer.getContext();
     ctx.strokeStyle = activeColor;
-    ctx.lineWidth = activeBrushSize;
+    ctx.fillStyle = activeColor;
     canvasHolder.bind('mousedown.tool', function (event) {
       var oldX = event.offsetX,
           oldY = event.offsetY;
       activeImage.setEdited(true);
-      canvasHolder.bind('mousemove.tool', function (event) {
-          //canvasUtil.fillCircle(ctx, event.offsetX, event.offsetY, 5);
-        if(oldX !== null && oldY !== null) {
-          ctx.beginPath();
-          ctx.moveTo(oldX, oldY);
-          ctx.lineTo(event.offsetX, event.offsetY);
-          ctx.stroke();
+      canvasUtil.fillCircle(ctx, event.offsetX, event.offsetY, activeBrushSize/2);
+      canvasHolder.bind('mousemove.toolActive', function (event) {
+        if (oldX && oldY) {
+          fillpoints(ctx, activeBrushSize, oldX, oldY, event.offsetX, event.offsetY, 8);
         }
         oldX = event.offsetX;
         oldY = event.offsetY;
       })
-      .bind('mouseleave.tool', function (event) {
+      .bind('mouseleave.toolActive', function (event) {
+        fillpoints(ctx, activeBrushSize, oldX, oldY, event.offsetX, event.offsetY, 8);
         oldX = oldY = null;
+      })
+      .bind('mouseenter.toolActive', function (event) {
+        oldX = event.offsetX;
+        oldY = event.offsetY;
       });
     });
     $(window).bind('mouseup.tool', function (event) {
-      canvasHolder.unbind('mousemove.tool');
+      canvasHolder.unbind('.toolActive');
       $(window).unbind('.tool');
     });
-      
+  };
+  
+  // Helper function for the pencil tool;
+  var fillpoints = function (ctx, brushSize, x1, y1, x2, y2, i) {
+    if (i > 0) {
+      midPointX = (x1 + x2)/2;
+      midPointY = (y1 + y2)/2;
+      canvasUtil.fillCircle(ctx, x2, y2, activeBrushSize/2);
+      canvasUtil.fillCircle(ctx, midPointX, midPointY, activeBrushSize/2);
+      fillpoints(ctx, brushSize, x1, y1, midPointX, midPointY, (i -1));
+      fillpoints(ctx, brushSize, midPointX, midPointY, x2, y2, (i-1));
+    }
   };
   
   /***************** Simple Bindings **********/
