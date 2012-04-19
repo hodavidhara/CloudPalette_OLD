@@ -37,10 +37,10 @@ $(function () {
     }
   };
   
-  var newLayer = function () {
+  var newLayer = function (layerName) {
     var activeImage = CloudPalette.getActiveImage(), 
-        imageName = activeImage.getName(),
-        layerName = prompt('What would you like to name your new layer?', 'layer-' + (activeImage.getLayers().length));
+        imageName = activeImage.getName();
+        
     $('#window-' + imageName).find('.canvas-holder').append(
       '<canvas id="layer-' + (activeImage.getLayers().length) +'" class="layer canvas-' + imageName + 
         '" width="'+ activeImage.getWidth() +'px" height="'+ activeImage.getHeight() +'px">Get a real browser!</canvas>'
@@ -327,8 +327,15 @@ $(function () {
     if($('#new-image-form-height').val() === "") {
       $('#new-image-form-height').val('450');
     }
-    $('.ui-dialog-buttonset > button:last').focus();
+    $('#new-image-form ~ .ui-dialog-buttonpane').find('.ui-dialog-buttonset > button:last').focus();
   };
+  
+  var openNewLayerForm = function () {
+    $('#new-layer-form').dialog('open');
+    $('#new-layer-form-name').val('layer-' + (activeImage.getLayers().length));
+    
+    $('#new-layer-form ~ .ui-dialog-buttonpane').find('.ui-dialog-buttonset > button:last').focus();
+  }
   
   $('#new-image-form').dialog({
       autoOpen: false,
@@ -339,7 +346,7 @@ $(function () {
       draggable: false,
       buttons: {
         Cancel: function() {
-          $( this ).dialog('close');
+          $(this).dialog('close');
         },
         'Ok': function () {
           var $name = $('#new-image-form-name'),
@@ -363,10 +370,38 @@ $(function () {
       }
     });
     
+    $('#new-layer-form').dialog({
+      autoOpen: false,
+      height: 250,
+      width: 350,
+      modal: true,
+      resizable: false,
+      draggable: false,
+      buttons: {
+        Cancel: function() {
+          $(this).dialog('close');
+        },
+        'Ok': function () {
+          var $name = $('#new-layer-form-name'),
+              $allFields = $([]).add($name),
+              $tips = $(".validate-tips"),
+              valid = true;
+              
+          $tips.text('All fields are required');
+          $allFields.removeClass("ui-state-error");
+          
+          valid = valid && checkRegexp($name, /^([0-9a-z\-])+$/i, $tips, 'Layer name must contain only letters, numbers, and the "-" symbol');
+          
+          if ( valid ) {
+            newLayer($name.val())
+            $(this).dialog('close');
+          }
+        }
+      }
+    });
+    
     var checkRegexp = function (field, regexp, tipbox, tip) {
-      console.log('checking regexp');
       if ( !( regexp.test( field.val() ) ) ) {
-        console.log(field);
         field.addClass("ui-state-error");
         updateTips(tipbox, tip);
         return false;
@@ -378,10 +413,6 @@ $(function () {
     var updateTips = function (tipbox, tip) {
       tipbox
         .text(tip)
-        .addClass("ui-state-highlight");
-      setTimeout(function() {
-        tipbox.removeClass("ui-state-highlight", 1500);
-      }, 500);
     };
   
   //***************** Simple Bindings ********** \\
@@ -403,20 +434,20 @@ $(function () {
   });
   
   // click binding for all the submenu items.
-  $('#new-image').click(openNewImageForm);
-  $('#save-image').click(saveImage);
+  $('#new-image').bind('click', openNewImageForm);
+  $('#save-image').bind('click', saveImage);
   
-  $('#undo').click(undoImage);
-  $('#redo').click(redoImage);
+  $('#undo').bind('click', undoImage);
+  $('#redo').bind('click', redoImage);
   
-  $('#new-layer').click(newLayer);
-  $('#flatten-image').click(flattenActiveImage);
+  $('#new-layer').bind('click', openNewLayerForm);
+  $('#flatten-image').bind('click', flattenActiveImage);
   
-  $('#color-toolbar').click(function () {
+  $('#color-toolbar').bind('click', function () {
     $('#color-container').toggle();
   })
   
-  $('#size-toolbar').click(function () {
+  $('#size-toolbar').bind('click', function () {
     $('#brush-size-container').toggle();
   })
   
