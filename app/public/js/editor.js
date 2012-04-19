@@ -9,25 +9,24 @@ $(function () {
       keypressStates = {ctrl: false, alt: false, shift: false};
   // Function that adds in the new window that contains the canvas, and creates the image object
   // Also calls all of the functions that does most a lot of the bindings.
-  var createImage = function () {
-    var canvasName = $('#new-image-form-name').val();
+  var createImage = function (canvasName, width, height) {
     if (canvasName !== null) {
       $('body').append(
         '<div id="window-' + canvasName + '" class="canvas-window">' +
           '<div class="window-menu">' +
-            '<button name="close" class="close">Close!</button>' +
+            '<button canvasName="close" class="close">Close!</button>' +
             '<p>'+canvasName+'</p>' +
           '</div>' +
           '<div class="canvas-holder">' +
-            '<canvas id="layer-0" class="layer canvas-' + canvasName + '" width="400px" height="400px">Get a real browser!</canvas>' +
+            '<canvas id="layer-0" class="layer canvas-' + canvasName + '" width="' + width + 'px" height="' + height + 'px">Get a real browser!</canvas>' +
           '</div>' +
         '</div>'
       );
       var top = 150 + (40 * (CloudPalette.getImageCount() % 10)),
           left = 400 + (40 * (CloudPalette.getImageCount() % 10));
       $('.canvas-window#window-' + canvasName).css({top: (top.toString() + 'px'), left: (left.toString() + 'px')});
-      $('.canvas-window#window-' + canvasName).find('.canvas-holder').css({height: '400px', width: '400px'});
-      CloudPalette.newImage(canvasName, getContext(canvasName, 0), 400, 400);
+      $('.canvas-window#window-' + canvasName).find('.canvas-holder').css({width: width+'px', height: height+'px'});
+      CloudPalette.newImage(canvasName, getContext(canvasName, 0), width, height);
       makeDraggable(canvasName);
       makeRemovable(canvasName);
       currentTool = (currentTool === null) ? pencilTool : currentTool;
@@ -336,7 +335,10 @@ $(function () {
           $( this ).dialog('close');
         },
         'Ok': function () {
-          createImage();
+          var name = $('#new-image-form-name').val(),
+              width = $('#new-image-form-width').val(),
+              height = $('#new-image-form-height').val();
+          createImage(name, width, height);
           $(this).dialog('close');
         }
       }
