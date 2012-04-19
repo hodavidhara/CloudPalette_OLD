@@ -43,7 +43,7 @@ $(function () {
         layerName = prompt('What would you like to name your new layer?', 'layer-' + (activeImage.getLayers().length));
     $('#window-' + imageName).find('.canvas-holder').append(
       '<canvas id="layer-' + (activeImage.getLayers().length) +'" class="layer canvas-' + imageName + 
-        '" width="400px" height="400px">Get a real browser!</canvas>'
+        '" width="'+ activeImage.getWidth() +'px" height="'+ activeImage.getHeight() +'px">Get a real browser!</canvas>'
     );
     activeImage.newLayer(layerName, getContext(imageName, activeImage.getLayers().length));
     activeImage.setActiveLayer(activeImage.getLayers().length - 1);
@@ -161,6 +161,7 @@ $(function () {
     });
     updateCanvasFromLayerData();
     loadLayerMenu();
+    activeImage.recordHistory();
   };
   
   var updateCanvasFromLayerData = function () {
@@ -173,7 +174,7 @@ $(function () {
       if($('#window-' + imageName).find('#layer-'+i).size() === 0) {
         $('#window-' + imageName).find('.canvas-holder').append(
           '<canvas id="layer-' + i +'" class="layer canvas-' + imageName + 
-            '" width="400px" height="400px">Get a real browser!</canvas>'
+            '" width="'+ activeImage.getWidth() +'px" height="'+ activeImage.getWidth() +'px">Get a real browser!</canvas>'
         );
         var newctx = getContext(imageName, i)
         layers[i].setContext(newctx);
@@ -209,7 +210,7 @@ $(function () {
     flattenActiveImage();
     var canvas = $('#window-' + imageName).find('#layer-0').get(0),
         canvasData = canvas.toDataURL("image/png");
-    
+    undoImage();
     window.open(canvasData);
   };
   
@@ -320,6 +321,12 @@ $(function () {
   var openNewImageForm = function () {
     $('#new-image-form').dialog('open');
     $('#new-image-form-name').val('Untitled-' + (CloudPalette.getImageCount()+1));
+    if($('#new-image-form-width').val() === "") {
+      $('#new-image-form-width').val('600');
+    }
+    if($('#new-image-form-height').val() === "") {
+      $('#new-image-form-height').val('450');
+    }
     $('.ui-dialog-buttonset > button:last').focus();
   };
   
@@ -335,14 +342,47 @@ $(function () {
           $( this ).dialog('close');
         },
         'Ok': function () {
-          var name = $('#new-image-form-name').val(),
-              width = $('#new-image-form-width').val(),
-              height = $('#new-image-form-height').val();
-          createImage(name, width, height);
-          $(this).dialog('close');
+          var $name = $('#new-image-form-name'),
+              $width = $('#new-image-form-width'),
+              $height = $('#new-image-form-height'),
+              $allFields = $([]).add($name).add($width).add($height),
+              $tips = $(".validate-tips"),
+              valid = true;
+              
+          $tips.text('All fields are required');
+          $allFields.removeClass("ui-state-error");
+          valid = valid && checkRegexp($name, /^([0-9a-z\-])+$/i, $tips, 'Image name must contain only letters, numbers, and the "-" symbol');
+          valid = valid && checkRegexp($width, /^([0-9])+$/, $tips, 'Image width must contain only numbers');
+          valid = valid && checkRegexp($height, /^([0-9])+$/, $tips, 'Image heigt must contain only numbers');
+          
+          if ( valid ) {
+            createImage($name.val(), $width.val(), $height.val());
+            $(this).dialog('close');
+          }
         }
       }
     });
+    
+    var checkRegexp = function (field, regexp, tipbox, tip) {
+      console.log('checking regexp');
+      if ( !( regexp.test( field.val() ) ) ) {
+        console.log(field);
+        field.addClass("ui-state-error");
+        updateTips(tipbox, tip);
+        return false;
+      } else {
+        return true;
+      }
+    };
+    
+    var updateTips = function (tipbox, tip) {
+      tipbox
+        .text(tip)
+        .addClass("ui-state-highlight");
+      setTimeout(function() {
+        tipbox.removeClass("ui-state-highlight", 1500);
+      }, 500);
+    };
   
   //***************** Simple Bindings ********** \\
   

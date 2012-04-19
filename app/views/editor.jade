@@ -87,6 +87,7 @@ html(lang="en")
         p 64
         
     #new-image-form(title='Create a new image')
+      p.validate-tips All fields are required
       form
         fieldset
           label(for='new-image-form-name') name: 
@@ -94,6 +95,8 @@ html(lang="en")
           .clear
           label(for='new-image-form-width') width: 
           input#new-image-form-width(type='text')
+          label px
           .clear
           label(for='new-image-form-height') height: 
           input#new-image-form-height(type='text')
+          label px
