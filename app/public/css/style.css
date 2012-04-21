@@ -65,7 +65,7 @@ body {
 #layer-container {
   position: fixed;
   left: 50px;
-  top: 300px;
+  top: 250px;
   width: 200px;
   height: 200px;
   overflow: auto;
@@ -95,9 +95,8 @@ body {
 }
 
 #color-container {
-  visibility: visible;
   position: fixed;
-  top: 550px;
+  top: 480px;
   left: 50px;
   z-index: 4;
   border: 1px solid black;
@@ -107,17 +106,29 @@ body {
   width: 40px;
   height: 40px;
   float: left;
-  border-bottom: 1px solid black;
+  border: 1px solid black;
+  cursor: pointer;
 }
 
-#slide {
-  width: 30px;
-  height: 200px;
+#brush-size-container {
+  position: fixed;
+  top: 600px;
+  left: 50px;
+  z-index: 4;
+  border: 1px solid black;
 }
 
-#picker {
-  width: 200px;
-  height: 200px;
+.brush-size {
+  width: 40px;
+  height: 40px;
+  float: left;
+  cursor: pointer;
+  border: 1px solid black;
+}
+
+.brush-size p {
+  text-align: center;
+  margin-top: 10px;
 }
 
 #black {
@@ -303,6 +314,12 @@ body {
   width: 26px;
   height: 3px;
   background: url(../assets/images/miniColors/line.gif) center no-repeat;
+}
+
+/* Popups! */
+.validate-tips {
+  padding: 5px 5px 10px 5px;
+  text-align: center;
 }
 
 /* Index */

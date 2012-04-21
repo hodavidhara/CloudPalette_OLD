@@ -4,6 +4,7 @@ html(lang="en")
     title CloudPalette
     link(rel='stylesheet', type='text/css', href='/css/reset.css')
     link(rel='stylesheet', type='text/css', href='/css/style.css')
+    link(rel='stylesheet', type='text/css', href='/css/jquery-ui-1.8.19.custom.css')
     script(type='text/javascript', src='/js/lib/jquery-1.7.1.min.js')
     script(type='text/javascript', src='/js/lib/jquery-ui-1.8.17.custom.min.js')
     script(type='text/javascript', src='/js/lib/jquery.miniColors.min.js')
@@ -39,6 +40,8 @@ html(lang="en")
           ul.horizontal-submenu
             li.horizontal-submenu-item#color-toolbar
               p colors
+            li.horizontal-submenu-item#size-toolbar
+              p sizes
         li.horizontal-menu-item
           p.bottom-right-radius Help
         .clear
@@ -65,3 +68,42 @@ html(lang="en")
       .color-swab#purple
       label custom colors: 
         input.color
+    #brush-size-container
+      .header#brush-size-header
+        p sizes
+      .brush-size#size-1 
+        p 1
+      .brush-size#size-2
+        p 2
+      .brush-size#size-4
+        p 4
+      .brush-size#size-8
+        p 8
+      .brush-size#size-16
+        p 16
+      .brush-size#size-32
+        p 32
+      .brush-size#size-64
+        p 64
+        
+    #new-image-form(title='Create a new image')
+      p.validate-tips All fields are required
+      form
+        fieldset
+          label(for='new-image-form-name') name: 
+          input#new-image-form-name(type='text')
+          .clear
+          label(for='new-image-form-width') width: 
+          input#new-image-form-width(type='text')
+          label px
+          .clear
+          label(for='new-image-form-height') height: 
+          input#new-image-form-height(type='text')
+          label px
+    #new-layer-form(title='Create a new layer')
+      p.validate-tips All fields are required
+      form
+        fieldset
+          label(for='new-image-form-name') name: 
+          input#new-layer-form-name(type='text')
+          .clear

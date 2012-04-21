@@ -4,29 +4,29 @@
 $(function () {
   var currentTool = null,
       activeColor = 'rgb(0, 0, 0)',
+      activeBrushSize = '1',
       activeImage = null;
       keypressStates = {ctrl: false, alt: false, shift: false};
   // Function that adds in the new window that contains the canvas, and creates the image object
   // Also calls all of the functions that does most a lot of the bindings.
-  var createImage = function () {
-    var canvasName = prompt('What would you like to name your image?', 'Untitled-' + (CloudPalette.getImageCount()+1));
+  var createImage = function (canvasName, width, height) {
     if (canvasName !== null) {
       $('body').append(
         '<div id="window-' + canvasName + '" class="canvas-window">' +
           '<div class="window-menu">' +
-            '<button name="close" class="close">Close!</button>' +
+            '<button canvasName="close" class="close">Close!</button>' +
             '<p>'+canvasName+'</p>' +
           '</div>' +
           '<div class="canvas-holder">' +
-            '<canvas id="layer-0" class="layer canvas-' + canvasName + '" width="400px" height="400px">Get a real browser!</canvas>' +
+            '<canvas id="layer-0" class="layer canvas-' + canvasName + '" width="' + width + 'px" height="' + height + 'px">Get a real browser!</canvas>' +
           '</div>' +
         '</div>'
       );
       var top = 150 + (40 * (CloudPalette.getImageCount() % 10)),
           left = 400 + (40 * (CloudPalette.getImageCount() % 10));
       $('.canvas-window#window-' + canvasName).css({top: (top.toString() + 'px'), left: (left.toString() + 'px')});
-      $('.canvas-window#window-' + canvasName).find('.canvas-holder').css({height: '400px', width: '400px'});
-      CloudPalette.newImage(canvasName, getContext(canvasName, 0), 400, 400);
+      $('.canvas-window#window-' + canvasName).find('.canvas-holder').css({width: width+'px', height: height+'px'});
+      CloudPalette.newImage(canvasName, getContext(canvasName, 0), width, height);
       makeDraggable(canvasName);
       makeRemovable(canvasName);
       currentTool = (currentTool === null) ? pencilTool : currentTool;
@@ -37,13 +37,13 @@ $(function () {
     }
   };
   
-  var newLayer = function () {
+  var newLayer = function (layerName) {
     var activeImage = CloudPalette.getActiveImage(), 
-        imageName = activeImage.getName(),
-        layerName = prompt('What would you like to name your new layer?', 'layer-' + (activeImage.getLayers().length));
+        imageName = activeImage.getName();
+        
     $('#window-' + imageName).find('.canvas-holder').append(
       '<canvas id="layer-' + (activeImage.getLayers().length) +'" class="layer canvas-' + imageName + 
-        '" width="400px" height="400px">Get a real browser!</canvas>'
+        '" width="'+ activeImage.getWidth() +'px" height="'+ activeImage.getHeight() +'px">Get a real browser!</canvas>'
     );
     activeImage.newLayer(layerName, getContext(imageName, activeImage.getLayers().length));
     activeImage.setActiveLayer(activeImage.getLayers().length - 1);
@@ -161,6 +161,7 @@ $(function () {
     });
     updateCanvasFromLayerData();
     loadLayerMenu();
+    activeImage.recordHistory();
   };
   
   var updateCanvasFromLayerData = function () {
@@ -173,7 +174,7 @@ $(function () {
       if($('#window-' + imageName).find('#layer-'+i).size() === 0) {
         $('#window-' + imageName).find('.canvas-holder').append(
           '<canvas id="layer-' + i +'" class="layer canvas-' + imageName + 
-            '" width="400px" height="400px">Get a real browser!</canvas>'
+            '" width="'+ activeImage.getWidth() +'px" height="'+ activeImage.getWidth() +'px">Get a real browser!</canvas>'
         );
         var newctx = getContext(imageName, i)
         layers[i].setContext(newctx);
@@ -209,7 +210,7 @@ $(function () {
     flattenActiveImage();
     var canvas = $('#window-' + imageName).find('#layer-0').get(0),
         canvasData = canvas.toDataURL("image/png");
-    
+    undoImage();
     window.open(canvasData);
   };
   
@@ -265,40 +266,156 @@ $(function () {
     $('#current-color').css('background-color', activeColor);
   }
   
+  var bindBrushSizePickers = function () {
+    activeBrushSize = $(this).text();
+  }
+  
   // This is the pencil tool
   var pencilTool = function (canvasHolder) {
     var activeImage = CloudPalette.getActiveImage(),
     activeLayer = activeImage.getLayer(activeImage.getActiveLayer()),
     ctx = activeLayer.getContext();
-    ctx.fillStyle = activeColor;
     ctx.strokeStyle = activeColor;
+    ctx.fillStyle = activeColor;
     canvasHolder.bind('mousedown.tool', function (event) {
       var oldX = event.offsetX,
           oldY = event.offsetY;
       activeImage.setEdited(true);
-      canvasHolder.bind('mousemove.tool', function (event) {
-          //canvasUtil.fillCircle(ctx, event.offsetX, event.offsetY, 5);
-        if(oldX !== null && oldY !== null) {
-          ctx.beginPath();
-          ctx.moveTo(oldX, oldY);
-          ctx.lineTo(event.offsetX, event.offsetY);
-          ctx.stroke();
+      canvasUtil.fillCircle(ctx, event.offsetX, event.offsetY, activeBrushSize/2);
+      canvasHolder.bind('mousemove.toolActive', function (event) {
+        if (oldX && oldY) {
+          fillpoints(ctx, activeBrushSize, oldX, oldY, event.offsetX, event.offsetY, 8);
         }
         oldX = event.offsetX;
         oldY = event.offsetY;
       })
-      .bind('mouseleave.tool', function (event) {
+      .bind('mouseleave.toolActive', function (event) {
+        fillpoints(ctx, activeBrushSize, oldX, oldY, event.offsetX, event.offsetY, 8);
         oldX = oldY = null;
+      })
+      .bind('mouseenter.toolActive', function (event) {
+        oldX = event.offsetX;
+        oldY = event.offsetY;
       });
     });
     $(window).bind('mouseup.tool', function (event) {
-      canvasHolder.unbind('mousemove.tool');
+      canvasHolder.unbind('.toolActive');
       $(window).unbind('.tool');
     });
-      
   };
   
-  /***************** Simple Bindings **********/
+  // Helper function for the pencil tool;
+  var fillpoints = function (ctx, brushSize, x1, y1, x2, y2, i) {
+    if (i > 0) {
+      midPointX = (x1 + x2)/2;
+      midPointY = (y1 + y2)/2;
+      canvasUtil.fillCircle(ctx, x2, y2, activeBrushSize/2);
+      canvasUtil.fillCircle(ctx, midPointX, midPointY, activeBrushSize/2);
+      fillpoints(ctx, brushSize, x1, y1, midPointX, midPointY, (i -1));
+      fillpoints(ctx, brushSize, midPointX, midPointY, x2, y2, (i-1));
+    }
+  };
+  
+    // ********************** Popups Setup ******************** \\
+  
+  var openNewImageForm = function () {
+    $('#new-image-form').dialog('open');
+    $('#new-image-form-name').val('Untitled-' + (CloudPalette.getImageCount()+1));
+    if($('#new-image-form-width').val() === "") {
+      $('#new-image-form-width').val('600');
+    }
+    if($('#new-image-form-height').val() === "") {
+      $('#new-image-form-height').val('450');
+    }
+    $('#new-image-form ~ .ui-dialog-buttonpane').find('.ui-dialog-buttonset > button:last').focus();
+  };
+  
+  var openNewLayerForm = function () {
+    $('#new-layer-form').dialog('open');
+    $('#new-layer-form-name').val('layer-' + (activeImage.getLayers().length));
+    
+    $('#new-layer-form ~ .ui-dialog-buttonpane').find('.ui-dialog-buttonset > button:last').focus();
+  }
+  
+  $('#new-image-form').dialog({
+      autoOpen: false,
+      height: 300,
+      width: 350,
+      modal: true,
+      resizable: false,
+      draggable: false,
+      buttons: {
+        Cancel: function() {
+          $(this).dialog('close');
+        },
+        'Ok': function () {
+          var $name = $('#new-image-form-name'),
+              $width = $('#new-image-form-width'),
+              $height = $('#new-image-form-height'),
+              $allFields = $([]).add($name).add($width).add($height),
+              $tips = $(".validate-tips"),
+              valid = true;
+              
+          $tips.text('All fields are required');
+          $allFields.removeClass("ui-state-error");
+          valid = valid && checkRegexp($name, /^([0-9a-z\-])+$/i, $tips, 'Image name must contain only letters, numbers, and the "-" symbol');
+          valid = valid && checkRegexp($width, /^([0-9])+$/, $tips, 'Image width must contain only numbers');
+          valid = valid && checkRegexp($height, /^([0-9])+$/, $tips, 'Image heigt must contain only numbers');
+          
+          if ( valid ) {
+            createImage($name.val(), $width.val(), $height.val());
+            $(this).dialog('close');
+          }
+        }
+      }
+    });
+    
+    $('#new-layer-form').dialog({
+      autoOpen: false,
+      height: 250,
+      width: 350,
+      modal: true,
+      resizable: false,
+      draggable: false,
+      buttons: {
+        Cancel: function() {
+          $(this).dialog('close');
+        },
+        'Ok': function () {
+          var $name = $('#new-layer-form-name'),
+              $allFields = $([]).add($name),
+              $tips = $(".validate-tips"),
+              valid = true;
+              
+          $tips.text('All fields are required');
+          $allFields.removeClass("ui-state-error");
+          
+          valid = valid && checkRegexp($name, /^([0-9a-z\-])+$/i, $tips, 'Layer name must contain only letters, numbers, and the "-" symbol');
+          
+          if ( valid ) {
+            newLayer($name.val())
+            $(this).dialog('close');
+          }
+        }
+      }
+    });
+    
+    var checkRegexp = function (field, regexp, tipbox, tip) {
+      if ( !( regexp.test( field.val() ) ) ) {
+        field.addClass("ui-state-error");
+        updateTips(tipbox, tip);
+        return false;
+      } else {
+        return true;
+      }
+    };
+    
+    var updateTips = function (tipbox, tip) {
+      tipbox
+        .text(tip)
+    };
+  
+  //***************** Simple Bindings ********** \\
   
   // Binding for the menu
   // hover bind to show submenu dropdowns.
@@ -317,17 +434,21 @@ $(function () {
   });
   
   // click binding for all the submenu items.
-  $('#new-image').click(createImage);
-  $('#save-image').click(saveImage);
+  $('#new-image').bind('click', openNewImageForm);
+  $('#save-image').bind('click', saveImage);
   
-  $('#undo').click(undoImage);
-  $('#redo').click(redoImage);
+  $('#undo').bind('click', undoImage);
+  $('#redo').bind('click', redoImage);
   
-  $('#new-layer').click(newLayer);
-  $('#flatten-image').click(flattenActiveImage);
+  $('#new-layer').bind('click', openNewLayerForm);
+  $('#flatten-image').bind('click', flattenActiveImage);
   
-  $('#color-toolbar').click(function () {
+  $('#color-toolbar').bind('click', function () {
     $('#color-container').toggle();
+  })
+  
+  $('#size-toolbar').bind('click', function () {
+    $('#brush-size-container').toggle();
   })
   
   
@@ -341,9 +462,13 @@ $(function () {
   });
   $('.miniColors-trigger').bind('click.colorSelect', bindColorPickers);
   
+  //Brush size selection handlign
+  $('.brush-size').bind('click.brushSizeSelect', bindBrushSizePickers);
+  
   makeToolsDraggable('#layer-container', '#layer-header');
   makeToolsDraggable('#toolbar-container', '#toolbar-header');
   makeToolsDraggable('#color-container', '#color-header');
+  makeToolsDraggable('#brush-size-container', '#brush-size-header');
   
   // **************************** KEYPRESS BINDINGS ************************** \\
   
