@@ -143,21 +143,35 @@ var CloudPalette = (function () {
         this.mergeLayers = function (bottomLayerIndex, topLayerIndex) {
           var topLayerData = layers[topLayerIndex].getData(),
               bottomLayerData = layers[bottomLayerIndex].getData(),
-              newData = layers[bottomLayerIndex].getContext().createImageData(width, height);
+              newData = layers[bottomLayerIndex].getContext().createImageData(width, height),
+              outR, outB, outG, outA, srcA, destA;
               
           for (var i = 0; i * 4 < newData.data.length; i++) {
             
-              newData.data[i*4] = bottomLayerData.data[i*4];
-              newData.data[(i*4) + 1] = bottomLayerData.data[(i*4) + 1];
-              newData.data[(i*4) + 2] = bottomLayerData.data[(i*4) + 2];
-              newData.data[(i*4) + 3] = bottomLayerData.data[(i*4) + 3];
-            // If the top layer has any 'empty' pixels, place the bottom layer pixels into the new image data. Else just use the top layers pixels.
-            if (topLayerData.data[i*4] !== 0 || topLayerData.data[(i*4) + 1] !== 0 || topLayerData.data[(i*4) + 2] !== 0 || topLayerData.data[(i*4) + 3] !== 0) {              
-              newData.data[i*4] = topLayerData.data[i*4];
-              newData.data[(i*4) + 1] = topLayerData.data[(i*4) + 1];
-              newData.data[(i*4) + 2] = topLayerData.data[(i*4) + 2];
-              newData.data[(i*4) + 3] = topLayerData.data[(i*4) + 3];
+            // alpha values in image data are stored on a scale between 0 - 255, so we want to change them
+            // to a scale between 0 and 1;
+            srcA = topLayerData.data[(i*4) + 3] / 255;
+            destA = bottomLayerData.data[(i*4) + 3] / 255;
+            
+            //computes the final alpha value of the blended pixels.
+            outA = srcA + (destA*(1 - srcA));
+            
+            // to avoid dividing by 0, check to see if the final alpha is 0. If it is just set the RGB to 0.
+            if (outA === 0) {
+              outR = outG = outB = 0;
+            } else {
+              // computes the final rbg values of the blended pixels
+              outR = ((topLayerData.data[i*4]*srcA) + (bottomLayerData.data[i*4]*destA*(1 - srcA))) / outA;
+              outB = ((topLayerData.data[(i*4) + 1]*srcA) + (bottomLayerData.data[(i*4) + 1]*destA*(1 - srcA))) / outA;
+              outG = ((topLayerData.data[(i*4) + 2]*srcA) + (bottomLayerData.data[(i*4) + 2]*destA*(1 - srcA))) / outA;
             }
+            // console.log('R: ' + outR + ', G: ' + outG + ', B: ' + outB + ', A: ' + outA)
+            newData.data[i*4] = outR;
+            newData.data[(i*4) + 1] = outB;
+            newData.data[(i*4) + 2] = outG;
+            // adjusting back to the 0 - 255 scale
+            newData.data[(i*4) + 3] = outA * 255;
+            
           }
           
           layers[bottomLayerIndex].setData(newData);
