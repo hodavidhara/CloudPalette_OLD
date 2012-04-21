@@ -15,13 +15,14 @@ var CloudPalette = (function () {
             name = n,
             width = w,
             height = h,
-            activeLayer = 0,
+            activeLayer = null,
             recentlyEdited = false;
 
         // Create the initial layer
         
         layers.push(new Layer("background", c.createImageData(width, height), c));
         history[0] = [layers[0].clone()]; 
+        activeLayer = layers[0];
             
         // Image public functions
         // TODO: Should these be added on to the prototype property after the creation??
@@ -57,7 +58,7 @@ var CloudPalette = (function () {
               throw new Error('No layer with index ' + lookup + ' exists.')
             }
           } else {
-            throw new Error('Invalid argument')
+            throw new Error('Invalid argument: Should use the index of a layer (number) or name of the layer (string)');
           }
         };
         
@@ -74,8 +75,18 @@ var CloudPalette = (function () {
           return activeLayer;
         };
         
+        this.getActiveLayerIndex = function () {
+          for (var i = 0; i < layers.length; i++) {
+            if (activeLayer === layers[i]) {
+              return i;
+            }
+          }
+          
+          throw new Error('We should never get this error, something is seriously wrong!');
+        };
+        
         this.setActiveLayer = function (a) {
-          activeLayer = a;
+          activeLayer = this.getLayer(a);
         };
         
         this.getEdited = function () {
@@ -123,7 +134,7 @@ var CloudPalette = (function () {
           placeInHistory--;
           if(history[placeInHistory]){
             layers = this.cloneHistory(placeInHistory);
-            activeLayer = layers.length - 1;
+            activeLayer = this.getLayer(layers.length - 1);
           } else {
             placeInHistory++;
             throw new Error('there is no history to undo');
@@ -134,6 +145,9 @@ var CloudPalette = (function () {
           placeInHistory++;
           if(history[placeInHistory]){
             layers = this.cloneHistory(placeInHistory);
+            // because we've been cloning layers, there may be a new object for the new active layer
+            // and we need to replace it.
+            activeLayer = this.getLayer(layers.length - 1);
           } else {
             placeInHistory--;
             throw new Error('there is no history to redo');
@@ -175,17 +189,30 @@ var CloudPalette = (function () {
           }
           
           layers[bottomLayerIndex].setData(newData);
-          layers.splice(topLayerIndex, 1);
-          if (activeLayer === topLayerIndex) {
-            activeLayer = bottomLayerIndex;
+          if (this.getActiveLayerIndex() === topLayerIndex) {
+            activeLayer = this.getLayer(bottomLayerIndex);
           }
+          layers.splice(topLayerIndex, 1);
         };
         
         this.flattenImage = function () {
           for (var i = layers.length - 1; i > 0 ; i--) {
             this.mergeLayers(i - 1, i);
           }
-          activeLayer = 0;          
+          activeLayer = this.getLayer(0);          
+        };
+        
+        this.moveLayer = function (layerIndex, newLocation) {
+          var layerToMove = layers.splice(layerIndex, 1)[0];
+          layers.splice(newLocation, 0, layerToMove);
+        };
+        
+        this.moveActiveLayerUp = function () {
+          this.moveLayer(this.getActiveLayerIndex(), this.getActiveLayerIndex() + 1);
+        };
+        
+        this.moveActiveLayerDown = function () {
+          this.moveLayer(this.getActiveLayerIndex(), this.getActiveLayerIndex() - 1);
         };
         
       },
@@ -202,7 +229,7 @@ var CloudPalette = (function () {
         
         this.setData = function (d) {
           data = d;
-        }
+        };
         
         this.getName = function () {
           return name;
@@ -210,7 +237,7 @@ var CloudPalette = (function () {
         
         this.setName = function (n) {
           name = n;
-        }
+        };
         
         this.getContext = function () {
           return ctx;
@@ -218,7 +245,7 @@ var CloudPalette = (function () {
         
         this.setContext = function (c) {
           ctx = c;
-        }
+        };
         
         this.clone = function () {
           var newData = ctx.createImageData(data.width, data.height);
@@ -227,7 +254,7 @@ var CloudPalette = (function () {
             newData.data[i] = data.data[i];
           }          
           return new Layer(name, newData, ctx);
-        }
+        };
       };
   var images = {},
       activeImage = undefined;

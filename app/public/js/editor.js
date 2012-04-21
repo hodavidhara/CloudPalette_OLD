@@ -18,7 +18,7 @@ $(function () {
             '<p>'+canvasName+'</p>' +
           '</div>' +
           '<div class="canvas-holder">' +
-            '<canvas id="layer-0" class="layer canvas-' + canvasName + '" width="' + width + 'px" height="' + height + 'px">Get a real browser!</canvas>' +
+            '<canvas id="layer-background" class="layer canvas-' + canvasName + '" width="' + width + 'px" height="' + height + 'px">Get a real browser!</canvas>' +
           '</div>' +
         '</div>'
       );
@@ -26,7 +26,7 @@ $(function () {
           left = 400 + (40 * (CloudPalette.getImageCount() % 10));
       $('.canvas-window#window-' + canvasName).css({top: (top.toString() + 'px'), left: (left.toString() + 'px')});
       $('.canvas-window#window-' + canvasName).find('.canvas-holder').css({width: width+'px', height: height+'px'});
-      CloudPalette.newImage(canvasName, getContext(canvasName, 0), width, height);
+      CloudPalette.newImage(canvasName, getContext(canvasName, 'background'), width, height);
       makeDraggable(canvasName);
       makeRemovable(canvasName);
       currentTool = (currentTool === null) ? pencilTool : currentTool;
@@ -42,10 +42,10 @@ $(function () {
         imageName = activeImage.getName();
         
     $('#window-' + imageName).find('.canvas-holder').append(
-      '<canvas id="layer-' + (activeImage.getLayers().length) +'" class="layer canvas-' + imageName + 
+      '<canvas id="layer-' + layerName +'" class="layer canvas-' + imageName + 
         '" width="'+ activeImage.getWidth() +'px" height="'+ activeImage.getHeight() +'px">Get a real browser!</canvas>'
     );
-    activeImage.newLayer(layerName, getContext(imageName, activeImage.getLayers().length));
+    activeImage.newLayer(layerName, getContext(imageName, layerName));
     activeImage.setActiveLayer(activeImage.getLayers().length - 1);
     activeImage.recordHistory();
     loadLayerMenu();
@@ -116,36 +116,57 @@ $(function () {
   
   var loadLayerMenu = function () {
     $('.layer-box').remove();
-    var layers = CloudPalette.getActiveImage().getLayers();
+    var activeImage = CloudPalette.getActiveImage();
+        layers = CloudPalette.getActiveImage().getLayers();
     for (var i = layers.length - 1; i >= 0; i--) {
       $('#layer-container').append(
-        '<div class="layer-box" id="layer' + i + '\">' +
+        '<div class="layer-box" id="layerbox-' + layers[i].getName() + '\">' +
           '<div class="layer-picture"></div>' +
           '<div class="layer-name">' +
             '<p>' + layers[i].getName() + '</p>' +
           '</div>' +
         '<div class="clear"></div>'
       )
-      $('#layer' + activeImage.getActiveLayer()).addClass('active-layer');
-      makeLayerActivatable(i);
+      $('#layerbox-' + activeImage.getActiveLayer().getName()).addClass('active-layer');
+      makeLayerBoxActivatable(layers[i].getName());
     }
   };
   
   var arrangeLayers = function () {
     var activeImage = CloudPalette.getActiveImage(),
-        imageName = activeImage.getName();
-    $('#window-' + imageName).find('.layer').each(function(i) {
-      $(this).css('z-index', i.toString())
+        imageName = activeImage.getName(),
+        layers = activeImage.getLayers();
+        
+    for (var i = 0; i < layers.length; i++) {
+      $('#window-' + imageName).find('#layer-' + layers[i].getName()).css('z-index', i.toString());
+    }
+  };
+  
+  var makeLayerBoxActivatable = function (layerName) {
+    $('#layerbox-' + layerName).bind('click.activateLayer', function () {
+      activeImage.setActiveLayer(layerName);
+      $('.active-layer').removeClass('active-layer');
+      $('#layerbox-' + layerName).addClass('active-layer');
+      bindTool($('.active-window').find('.canvas-holder'), currentTool);
     });
   };
   
-  var makeLayerActivatable = function (layerNo) {
-    $('#layer' + layerNo).bind('click.activateLayer', function () {
-      activeImage.setActiveLayer(layerNo);
-      $('.active-layer').removeClass('active-layer');
-      $('#layer' + layerNo).addClass('active-layer');
-      bindTool($('.active-window').find('.canvas-holder'), currentTool);
-    });
+  var moveLayerUp = function () {
+    var activeImage = CloudPalette.getActiveImage();
+        
+        activeImage.moveActiveLayerUp();
+        loadLayerMenu();
+        arrangeLayers();
+        activeImage.recordHistory();
+  };
+  
+  var moveLayerDown = function () {
+    var activeImage = CloudPalette.getActiveImage();
+        
+        activeImage.moveActiveLayerDown();
+        loadLayerMenu();
+        arrangeLayers();
+        activeImage.recordHistory();
   };
   
   var flattenActiveImage = function () {
@@ -155,8 +176,8 @@ $(function () {
     
     activeImage.flattenImage();
     $('#window-' + imageName).find('.layer').each(function(i) {
-      if (i !== 0) {
-        $('#window-' + imageName).find('#layer-' + i).remove();
+      if ($(this).attr('id') !== '#layer-background') {
+        $(this).remove();
       }      
     });
     updateCanvasFromLayerData();
@@ -171,12 +192,12 @@ $(function () {
     ctx;
     
     for (var i = 0; i < layers.length; i++) {
-      if($('#window-' + imageName).find('#layer-'+i).size() === 0) {
+      if($('#window-' + imageName).find('#layer-'+ layers[i].getName()).size() === 0) {
         $('#window-' + imageName).find('.canvas-holder').append(
-          '<canvas id="layer-' + i +'" class="layer canvas-' + imageName + 
+          '<canvas id="layer-' + layers[i].getName() +'" class="layer canvas-' + imageName + 
             '" width="'+ activeImage.getWidth() +'px" height="'+ activeImage.getWidth() +'px">Get a real browser!</canvas>'
         );
-        var newctx = getContext(imageName, i)
+        var newctx = getContext(imageName, layers[i].getName())
         layers[i].setContext(newctx);
         activeImage.updateHistoryCtxForLayer(i);
         activeImage.setActiveLayer(i);
@@ -189,18 +210,20 @@ $(function () {
     
     $('#window-' + imageName).find('.layer').each(function(i) {
       if (i >= layers.length) {
-        $('#window-' + imageName).find('#layer-' + i).remove();
+        //TODO might need fixing!
+        $(this).remove();
       }      
     });
     
     loadLayerMenu();
+    arrangeLayers();
   }
   
   // gets the context from the canvas element, given the name of the image.
   // This should only be used once to get the context from the canvas, then stored in the
   // Image object. From then on we should be using the Images getContext function.
-  var getContext = function (canvasName, layerNumber) {
-    return $('.canvas-window#window-' + canvasName).find('#layer-' + layerNumber).get(0).getContext('2d');
+  var getContext = function (canvasName, layerName) {
+    return $('.canvas-window#window-' + canvasName).find('#layer-' + layerName).get(0).getContext('2d');
   };
   
   var saveImage = function () {
@@ -208,7 +231,7 @@ $(function () {
         imageName = activeImage.getName();
     
     flattenActiveImage();
-    var canvas = $('#window-' + imageName).find('#layer-0').get(0),
+    var canvas = $('#window-' + imageName).find('#layer-background').get(0),
         canvasData = canvas.toDataURL("image/png");
     undoImage();
     window.open(canvasData);
@@ -245,7 +268,7 @@ $(function () {
   var bindSaveLayer = function () {
     $(window).bind('mouseup.saveLayer', function () {
       var activeImage = CloudPalette.getActiveImage(),
-          activeLayer = activeImage.getLayer(activeImage.getActiveLayer()),
+          activeLayer = activeImage.getActiveLayer(),
           ctx = activeLayer.getContext();
       if(activeImage.getEdited()){
         activeLayer.setData(ctx.getImageData(0,0, activeImage.getWidth(), activeImage.getHeight()));
@@ -273,7 +296,7 @@ $(function () {
   // This is the pencil tool
   var pencilTool = function (canvasHolder) {
     var activeImage = CloudPalette.getActiveImage(),
-    activeLayer = activeImage.getLayer(activeImage.getActiveLayer()),
+    activeLayer = activeImage.getActiveLayer(),
     ctx = activeLayer.getContext();
     ctx.strokeStyle = activeColor;
     ctx.fillStyle = activeColor;
@@ -441,6 +464,8 @@ $(function () {
   $('#redo').bind('click', redoImage);
   
   $('#new-layer').bind('click', openNewLayerForm);
+  $('#move-layer-up').bind('click', moveLayerUp);
+  $('#move-layer-down').bind('click', moveLayerDown);
   $('#flatten-image').bind('click', flattenActiveImage);
   
   $('#color-toolbar').bind('click', function () {
