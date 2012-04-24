@@ -300,6 +300,7 @@ $(function () {
     ctx = activeLayer.getContext();
     ctx.strokeStyle = activeColor;
     ctx.fillStyle = activeColor;
+    ctx.lineWidth = activeBrushSize;
     canvasHolder.bind('mousedown.tool', function (event) {
       var oldX = event.offsetX,
           oldY = event.offsetY;
@@ -307,13 +308,21 @@ $(function () {
       canvasUtil.fillCircle(ctx, event.offsetX, event.offsetY, activeBrushSize/2);
       canvasHolder.bind('mousemove.toolActive', function (event) {
         if (oldX && oldY) {
-          fillpoints(ctx, activeBrushSize, oldX, oldY, event.offsetX, event.offsetY, 8);
+          canvasUtil.fillCircle(ctx, event.offsetX, event.offsetY, activeBrushSize/2);
+          ctx.beginPath();
+          ctx.moveTo(oldX, oldY);
+          ctx.lineTo(event.offsetX, event.offsetY);
+          ctx.stroke();
         }
         oldX = event.offsetX;
         oldY = event.offsetY;
       })
       .bind('mouseleave.toolActive', function (event) {
-        fillpoints(ctx, activeBrushSize, oldX, oldY, event.offsetX, event.offsetY, 8);
+        canvasUtil.fillCircle(ctx, event.offsetX, event.offsetY, activeBrushSize/2);
+        ctx.beginPath();
+        ctx.moveTo(oldX, oldY);
+        ctx.lineTo(event.offsetX, event.offsetY);
+        ctx.stroke();
         oldX = oldY = null;
       })
       .bind('mouseenter.toolActive', function (event) {
@@ -325,18 +334,6 @@ $(function () {
       canvasHolder.unbind('.toolActive');
       $(window).unbind('.tool');
     });
-  };
-  
-  // Helper function for the pencil tool;
-  var fillpoints = function (ctx, brushSize, x1, y1, x2, y2, i) {
-    if (i > 0) {
-      midPointX = (x1 + x2)/2;
-      midPointY = (y1 + y2)/2;
-      canvasUtil.fillCircle(ctx, x2, y2, activeBrushSize/2);
-      canvasUtil.fillCircle(ctx, midPointX, midPointY, activeBrushSize/2);
-      fillpoints(ctx, brushSize, x1, y1, midPointX, midPointY, (i -1));
-      fillpoints(ctx, brushSize, midPointX, midPointY, x2, y2, (i-1));
-    }
   };
   
     // ********************** Popups Setup ******************** \\
