@@ -35,11 +35,7 @@ layerTest.addBatch({
       image2.newLayer('layer2', {});
       image2.newLayer('layer3', {});
       return image2;
-    }(),
-    'can move layers around': function (image) {
-      image.moveLayer('layer3', 1);
-      assert.equal(image.getLayer(1), image.getLayer('layer3'));
-    }
+    }()
     
   }
   
